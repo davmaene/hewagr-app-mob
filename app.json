@@ -1,0 +1,112 @@
+{
+  "expo": {
+    "name": "HewAgri",
+    "slug": "hew-agri-app",
+    "version": "1.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.hewagri.kivugreen",
+      "buildNumber": "1.0.1",
+      "infoPlist": {
+        "NSCameraUsageDescription": "hewAgri démande accès à la camera pour scanner le QRCode au processus de paiement de transport",
+        "NSPhotoLibraryUsageDescription": "hewAgri démande un accès à votre librairie pour vous pemettre de séléctionner une image de profile",
+        "NSUserActivityTypes": [
+          "INSendMessageIntent"
+        ]
+      }
+    },
+    "android": {
+      "package": "com.hewagri.kivugreen",
+      "versionCode": 1,
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION", 
+        "android.permission.ACCESS_FINE_LOCATION", 
+        "android.permission.ACCESS_MEDIA_LOCATION", 
+        "android.permission.ACCESS_NETWORK_STATE", 
+        "android.permission.ACCESS_WIFI_STATE", 
+        "android.permission.CAMERA", 
+        "android.permission.FOREGROUND_SERVICE", 
+        "android.permission.HIGH_SAMPLING_RATE_SENSORS", 
+        "android.permission.INTERNET", 
+        "android.permission.MANAGE_DOCUMENTS", 
+        "android.permission.MODIFY_AUDIO_SETTINGS", 
+        "android.permission.READ_APP_BADGE", 
+        "android.permission.READ_CALENDAR", 
+        "android.permission.READ_CONTACTS", 
+        "android.permission.READ_EXTERNAL_STORAGE", 
+        "android.permission.READ_INTERNAL_STORAGE", 
+        "android.permission.READ_PHONE_STATE", 
+        "android.permission.RECEIVE_BOOT_COMPLETED", 
+        "android.permission.RECORD_AUDIO", 
+        "android.permission.SCHEDULE_EXACT_ALARM", 
+        "android.permission.SYSTEM_ALERT_WINDOW", 
+        "android.permission.USE_BIOMETRIC", 
+        "android.permission.USE_FINGERPRINT", 
+        "android.permission.VIBRATE", 
+        "android.permission.WAKE_LOCK", 
+        "android.permission.WRITE_CALENDAR", 
+        "android.permission.WRITE_EXTERNAL_STORAGE", 
+        "android.permission.WRITE_SETTINGS", 
+        "com.anddoes.launcher.permission.UPDATE_COUNT", 
+        "com.android.launcher.permission.INSTALL_SHORTCUT", 
+        "com.google.android.c2dm.permission.RECEIVE", 
+        "com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE", 
+        "com.google.android.gms.permission.ACTIVITY_RECOGNITION", 
+        "com.google.android.gms.permission.AD_ID", 
+        "com.google.android.providers.gsf.permission.READ_GSERVICES", 
+        "com.hewagreen.kivugreen.permission.C2D_MESSAGE", 
+        "com.htc.launcher.permission.READ_SETTINGS", 
+        "com.htc.launcher.permission.UPDATE_SHORTCUT", 
+        "com.huawei.android.launcher.permission.CHANGE_BADGE", 
+        "com.huawei.android.launcher.permission.READ_SETTINGS", 
+        "com.huawei.android.launcher.permission.WRITE_SETTINGS", 
+        "com.majeur.launcher.permission.UPDATE_BADGE", 
+        "com.oppo.launcher.permission.READ_SETTINGS", 
+        "com.oppo.launcher.permission.WRITE_SETTINGS", 
+        "com.sec.android.provider.badge.permission.READ", 
+        "com.sec.android.provider.badge.permission.WRITE", 
+        "com.sonyericsson.home.permission.BROADCAST_BADGE", 
+        "com.sonymobile.home.permission.PROVIDER_INSERT_BADGE", 
+        "host.exp.exponent.permission.C2D_MESSAGE", 
+        "me.everything.badger.permission.BADGE_COUNT_READ", 
+        "me.everything.badger.permission.BADGE_COUNT_WRITE"
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBPD1EXpbRQ4V2DegVn5OIa76FyY5JchPU"
+        }
+      },
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#FFFFFF"
+      }
+    },
+    "web": {
+      "favicon": "./assets/icon.png"
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#ffffff",
+          "mode": "production"
+        }
+      ]
+    ]
+  }
+}
