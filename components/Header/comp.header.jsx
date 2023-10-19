@@ -45,39 +45,33 @@ export const Header = ({ colors }) => {
                     </View>
                 )
             }
-
             {/* ====================================================== */}
-            {shown &&
-                (
-                    <View style=
-                        {
-                            {
-                                padding: 10,
-                                alignContent: "center",
-                                alignSelf: "center",
-                                marginTop: 5,
-                                height: 100,
-                                alignItems: "center",
-                                // backgroundColor: "lime",
-                                justifyContent: "center",
-                                flexDirection: "row"
-                            }
-                        }
-                    >
-                        <View style={{ alignSelf: "flex-start", width: "35%" }}>
-                            <Animated.Image
-                                source={colors && colors === Colors.primaryColor ? require("../../assets/images/hewagri-logo.png") : require("../../assets/images/HewAgri_FN-02.png")}
-                                style={{ opacity: 1, width: 140, height: 100, resizeMode: "cover", alignSelf: "center" }}
-                                PlaceholderContent={<Loader color={Colors.whiteColor} />}
-                            />
-                        </View>
-                        <View style={{ borderRightColor: Colors.whiteColor, borderRightWidth: 2, width: "5%", height: "100%", paddingHorizontal: 10 }} />
-                        <View style={{ width: "60%", height: 35, paddingLeft: 10 }}>
-                            <Text style={{ fontFamily: "mons-b", textAlign: "center", fontSize: Dims.titletextsize * .8, color: colors ? colors : Colors.primaryColor, flex: 0, paddingVertical: 2 }}>{appslogan}</Text>
-                            <Text style={{ textAlign: "center", fontFamily: "mons-e", color: colors ? colors : Colors.primaryColor }} >Avec {appname} la météo agricole est 100% rassurée</Text>
-                        </View>
+            {shown && (
+                <View style={{
+                    padding: 10,
+                    alignContent: "center",
+                    alignSelf: "center",
+                    marginTop: 5,
+                    height: 100,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexDirection: "row"
+                }}
+                >
+                    <View style={{ alignSelf: "flex-start", width: "35%" }}>
+                        <Animated.Image
+                            source={colors && colors === Colors.primaryColor ? require("../../assets/images/hewagri-logo.png") : require("../../assets/images/HewAgri_FN-02.png")}
+                            style={{ opacity: 1, width: 140, height: 100, resizeMode: "cover", alignSelf: "center" }}
+                            PlaceholderContent={<Loader color={Colors.whiteColor} />}
+                        />
                     </View>
-                )
+                    <View style={{ borderRightColor: Colors.whiteColor, borderRightWidth: 2, width: "5%", height: "100%", paddingHorizontal: 10 }} />
+                    <View style={{ width: "60%", height: 35, paddingLeft: 10 }}>
+                        <Text style={{ fontFamily: "mons-b", textAlign: "center", fontSize: Dims.titletextsize * .8, color: colors ? colors : Colors.primaryColor, flex: 0, paddingVertical: 2 }}>{appslogan}</Text>
+                        <Text style={{ textAlign: "center", fontFamily: "mons-e", color: colors ? colors : Colors.primaryColor }} >Avec {appname} la météo agricole est 100% rassurée</Text>
+                    </View>
+                </View>
+            )
             }
         </>
     )
