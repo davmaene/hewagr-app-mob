@@ -290,7 +290,7 @@ export const SigninScreen = ({ navigation, route }) => {
                                         <View style={{ paddingTop: 10, alignSelf: "flex-end" }}>
                                             <TouchableHighlight
                                                 underlayColor={Colors.whiteColor}
-                                                onPress={() => navigation.navigate("oublimotdepasse")}
+                                                onPress={() => navigation.replace("oublimotdepasse")}
                                                 style={{ width: "100%", borderRadius: Dims.borderradius, paddingVertical: 6, justifyContent: "center", alignContent: "center", alignItems: "center", flexDirection: "row" }}
                                             >
                                                 <>
