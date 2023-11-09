@@ -72,10 +72,24 @@ const BottomSheetDialog = ({ visible, navigation, route }) => {
                                     key: keys['loginState']
                                 }, (er, ok) => {
                                     if(ok){
-                                        global.user = global.user;
-                                        global.token = 'xaqxswcdevfr';
-                                        global.iscollecteur = 0;
-                                        navigation.replace("tabs");
+                                        localStorageSAVE({
+                                            data: `Bearer ${done['data']['token']}`,
+                                            expires: sessionExpires,
+                                            key: keys['token']
+                                        }, (er_, dn) => {
+                                            if (dn) {
+                                                global.user = insert;
+                                                global.token = token;
+                                                global.iscollecteur = 0;
+                                                navigation.replace("tabs");
+                                            } else {
+                                                Toast.show({
+                                                    type: 'error',
+                                                    text1: 'Erreur',
+                                                    text2: 'Une erreur est survenue lors de la vérification du compte !',
+                                                });
+                                            }
+                                        })
                                     }else{
                                         Toast.show({
                                             type: 'error',

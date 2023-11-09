@@ -27,6 +27,7 @@ export const SigninScreen = ({ navigation, route }) => {
     const [toolt, settoolt] = React.useState("");
     const [toolte, settoolte] = React.useState("");
     const [isVisible, setisVisible] = React.useState(false);
+    const [isVisible__1, setisVisible__1] = React.useState(false);
     const ref = React.useRef();
     const [showupchoice, setshowupchoice] = React.useState(true);
 
@@ -79,42 +80,62 @@ export const SigninScreen = ({ navigation, route }) => {
                                     switch (done['status']) {
                                         case 200:
                                             const u = done && done['data'];
-                                            onRunInsertQRY({
-                                                table: "__tbl_user",
-                                                columns: `'realid', 'nom', 'postnom', 'prenom', 'datenaissance', 'email', 'phone', 'adresse', 'genre', 'idvillage', 'crearedon', 'iscollector'`,
-                                                dot: "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?",
-                                                values: [`${u['id']}`, `${u['nom']}`, `${u['postnom']}`, `${u['prenom']}`, `${u['datenaissance']}`, `${u['email']}`, `${u['phone']}`, `${u['adresse']}`, `${u['genre']}`, `${u['idvillage']}`, `${new Date().toLocaleString()}`, 0]
-                                            }, (err, insert) => {
+                                            const { roles, idlangue, isactivated, token } = u;
+                                            if (Array.isArray(roles) && roles.indexOf(1) !== -1) {
+                                                onRunInsertQRY({
+                                                    table: "__tbl_user",
+                                                    columns: `'realid', 'nom', 'postnom', 'prenom', 'datenaissance', 'email', 'phone', 'adresse', 'genre', 'idvillage', 'crearedon', 'iscollector'`,
+                                                    dot: "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?",
+                                                    values: [`${u['id']}`, `${u['nom']}`, `${u['postnom']}`, `${u['prenom']}`, `${u['datenaissance']}`, `${u['email']}`, `${u['phone']}`, `${u['adresse']}`, `${u['genre']}`, `${u['idvillage']}`, `${new Date().toLocaleString()}`, 0]
+                                                }, (err, insert) => {
 
-                                                if (insert) {
+                                                    if (insert) {
 
-                                                    localStorageSAVE({
-                                                        data: insert,
-                                                        expires: sessionExpires,
-                                                        key: keys['loginState']
-                                                    }, (er, ok) => {
-                                                        if (ok) {
-                                                            global.user = insert;
-                                                            global.token = 'xaqxswcdevfr';
-                                                            global.iscollecteur = 0;
-                                                            navigation.replace("tabs");
-                                                        } else {
-                                                            Toast.show({
-                                                                type: 'error',
-                                                                text1: 'Erreur',
-                                                                text2: 'Une erreur est survenue lors de la vérification du compte !',
-                                                            });
-                                                        }
-                                                    })
-                                                } else {
-                                                    setisloading(false);
-                                                    Toast.show({
-                                                        type: 'error',
-                                                        text1: 'Erreur',
-                                                        text2: 'Une erreur est survenue lors de l\'activation du compte !',
-                                                    });
-                                                }
-                                            })
+                                                        localStorageSAVE({
+                                                            data: insert,
+                                                            expires: sessionExpires,
+                                                            key: keys['loginState']
+                                                        }, (er, ok) => {
+                                                            if (ok) {
+                                                                localStorageSAVE({
+                                                                    data: `Bearer ${token}`,
+                                                                    expires: sessionExpires,
+                                                                    key: keys['token']
+                                                                }, (er_, dn) => {
+                                                                    if (dn) {
+                                                                        global.user = insert;
+                                                                        global.token = token;
+                                                                        global.iscollecteur = 0;
+                                                                        navigation.replace("tabs");
+                                                                    } else {
+                                                                        Toast.show({
+                                                                            type: 'error',
+                                                                            text1: 'Erreur',
+                                                                            text2: 'Une erreur est survenue lors de la vérification du compte !',
+                                                                        });
+                                                                    }
+                                                                })
+                                                            } else {
+                                                                Toast.show({
+                                                                    type: 'error',
+                                                                    text1: 'Erreur',
+                                                                    text2: 'Une erreur est survenue lors de la vérification du compte !',
+                                                                });
+                                                            }
+                                                        })
+                                                    } else {
+                                                        setisloading(false);
+                                                        Toast.show({
+                                                            type: 'error',
+                                                            text1: 'Erreur',
+                                                            text2: 'Une erreur est survenue lors de l\'activation du compte !',
+                                                        });
+                                                    }
+                                                })
+                                            } else {
+                                                setoutput("Votre compte n'est pas assigner comme un compte amabssadeur, vous ne pouvez pas utiliser cette application pour l'instant !")
+                                                setisVisible__1(true)
+                                            }
                                             break;
                                         case 203:
                                             setoutput("Le mot de passe ou le nom d'utilisateur est incorect")
@@ -161,6 +182,7 @@ export const SigninScreen = ({ navigation, route }) => {
                                             break;
                                     }
                                 } else {
+                                    console.log(err, done);
                                     setisloading(false)
                                     setoutput("Une erreur inconue vient de se produire !")
                                     Toast.show({
@@ -321,14 +343,14 @@ export const SigninScreen = ({ navigation, route }) => {
                                             </Text>
                                         </View>
                                     </View>
-                                    <View style={{ flexDirection: "row", width: "85%", alignSelf: "center", alignContent: "center", alignItems: "center", justifyContent: "space-between" }}>
-                                        <View style={{ width: "40%" }}>
+                                    <View style={{ flexDirection: "row", marginTop: 20, width: "85%", alignSelf: "center", alignContent: "center", alignItems: "center", justifyContent: "space-between" }}>
+                                        <View style={{ width: "30%" }}>
                                             <Divider style={{ height: 2 }} />
                                         </View>
                                         <View>
                                             <Text style={{ fontFamily: "mons-b", color: Colors.primaryColor }}>OU</Text>
                                         </View>
-                                        <View style={{ width: "40%" }}>
+                                        <View style={{ width: "30%" }}>
                                             <Divider />
                                         </View>
                                     </View>
@@ -409,6 +431,22 @@ export const SigninScreen = ({ navigation, route }) => {
                         {
                             sColor: Colors.darkColor,
                             sText: "Il semble que vous n'êtes pas connectez sur internet, connectez votre téléphone sur internet puis réessayez"
+                        }
+                    }
+                />
+                <BottomSheetDialog
+                    navigation={navigation}
+                    visible={isVisible__1}
+                    title={
+                        {
+                            color: Colors.dangerColor,
+                            text: "Accréditation"
+                        }
+                    }
+                    subTitle={
+                        {
+                            sColor: Colors.darkColor,
+                            sText: "Votre compte n'est pas assigner comme un compte amabssadeur, vous ne pouvez pas utiliser cette application pour l'instant !"
                         }
                     }
                 />
