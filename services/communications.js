@@ -10,10 +10,11 @@ OnInitialize(); // initialize tables and create them if not exist
 axios.interceptors.request.use(async config => {
     const controller = new AbortController();
     const { code, data, message } = await syncLocalStorageLOAD({ key: keys['token'] });
-    bearer = data;
-    config.headers.apikey = "$2b$10$AS6GbX37SkQS6skhMOYjveDOuUUgvGz9dvsrCbeylWl/SwMkDDp2G";
-    config.headers.apikeyaccess = "kivugreen@api2022";
-    config.headers['x-connexion-hewagri'] = data.trim();
+    if (code === 200) {
+        config.headers.apikey = "$2b$10$AS6GbX37SkQS6skhMOYjveDOuUUgvGz9dvsrCbeylWl/SwMkDDp2G";
+        config.headers.apikeyaccess = "kivugreen@api2022";
+        config.headers['x-connexion-hewagri'] = data.trim();
+    }
     return { ...config, signal: controller.signal };
 }, rejected => {
     return new Promise.reject(rejected)
@@ -314,7 +315,7 @@ export const syncLocalStorageLOAD = async ({ key }) => {
         return {
             code: 500,
             message: "Error",
-            data: []
+            data: error
         }
     }
 };

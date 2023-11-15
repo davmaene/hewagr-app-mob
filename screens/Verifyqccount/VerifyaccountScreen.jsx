@@ -50,7 +50,7 @@ export const VerifyaccountScreen = ({ navigation, route }) => {
                 }
             }, (er, dn) => {
                 if (dn && dn['status'] === 200) {
-
+                    const { roles, idlangue, isactivated, token } = u;
                     onRunInsertQRY({
                         table: "__tbl_user",
                         columns: `'realid', 'nom', 'postnom', 'prenom', 'datenaissance', 'email', 'phone', 'adresse', 'genre', 'idvillage', 'crearedon', 'iscollector'`,
@@ -64,10 +64,24 @@ export const VerifyaccountScreen = ({ navigation, route }) => {
                                 key: keys['loginState']
                             }, (er, ok) => {
                                 if (ok) {
-                                    global.user = insert;
-                                    global.token = 'zaqxswcde';
-                                    global.iscollecteur = 0;
-                                    navigation.replace("tabs");
+                                    localStorageSAVE({
+                                        data: `Bearer ${token}`,
+                                        expires: sessionExpires,
+                                        key: keys['token']
+                                    }, (er_, dn) => {
+                                        if (dn) {
+                                            global.user = insert;
+                                            global.token = token;
+                                            global.iscollecteur = 0;
+                                            navigation.replace("tabs");
+                                        } else {
+                                            Toast.show({
+                                                type: 'error',
+                                                text1: 'Erreur',
+                                                text2: 'Une erreur est survenue lors de la vérification du compte !',
+                                            });
+                                        }
+                                    })
                                 } else {
                                     Toast.show({
                                         type: 'error',

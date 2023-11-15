@@ -41,66 +41,6 @@ export const VerifyAccountOnForgetenScreen = ({ navigation, route }) => {
         setisloading(true)
         if(value === c){
             navigation.replace("changepassword", { item: u })
-            // onRunExternalRQST({
-            //     url: '/ambassadeurs/ambassadeur/switchaccount',
-            //     method: "PUT",
-            //     data: {
-            //         email: u && u['phone'],
-            //         switcher: "ON",
-            //         code: c
-            //     }
-            // }, (er, dn) => {
-            //     if(dn && dn['status'] === 200){
-                    
-            //         onRunInsertQRY({
-            //             table: "__tbl_user",
-            //             columns: `'realid', 'nom', 'postnom', 'prenom', 'datenaissance', 'email', 'phone', 'adresse', 'genre', 'idvillage', 'crearedon', 'iscollector'`,
-            //             dot: "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?",
-            //             values: [`${u['id']}`, `${u['nom']}`, `${u['postnom']}`, `${u['prenom']}`, `${u['datenaissance']}`, `${u['email']}`, `${u['phone']}`, `${u['adresse']}`, `${u['genre']}` ,`${u['idvillage']}`, `${new Date().toLocaleString()}`, 0]
-            //         }, (err, insert) => {
-            //             if(insert){
-            //                 localStorageSAVE({
-            //                     data: insert,
-            //                     expires: sessionExpires,
-            //                     key: keys['loginState']
-            //                 }, (er, ok) => {
-            //                     if(ok){
-            //                         global.user = insert;
-            //                         global.token = 'zaqxswcde';
-            //                         global.iscollecteur = 0;
-            //                         navigation.replace("tabs");
-            //                     }else{
-            //                         Toast.show({
-            //                             type: 'error',
-            //                             text1: 'Erreur',
-            //                             text2: 'Une erreur est survenue lors de la vérification du compte !',
-            //                         });
-            //                     }
-            //                 })
-            //             }else{
-            //                 setisloading(false);
-            //                 setcanverify(true);
-            //                 setValue("")
-            //                 Toast.show({
-            //                     type: 'error',
-            //                     text1: 'Erreur',
-            //                     text2: 'Une erreur est survenue lors de l\'activation du compte !',
-            //                 });
-            //             }
-            //         })
-
-            //     }else{
-            //         setisloading(false);
-            //         setcanverify(true);
-            //         setValue("")
-            //         Toast.show({
-            //             type: 'error',
-            //             text1: 'Erreur',
-            //             text2: 'Une erreur est survenue lors de l\'activation du compte !',
-            //         });
-            //     }
-            // })
-
         }else{
             setisloading(false)
             setValue("")
