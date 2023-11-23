@@ -34,7 +34,7 @@ export const CollectScreen = ({ navigation, route }) => {
     ]);
     const [isVisible, setisVisible] = React.useState(false);
     const [output, setoutput] = React.useState("");
-    
+
     const [comments, setcomments] = React.useState("");
     const [produit, setproduit] = React.useState("");
     const [price, setprice] = React.useState("");
@@ -46,7 +46,7 @@ export const CollectScreen = ({ navigation, route }) => {
     const refc = React.useRef();
 
     const BottomSheetDialog = ({ navigation, visible, title: { text, color }, subTitle: { sText, sColor } }) => {
-        return(
+        return (
             <Modal
                 isVisible={visible}
                 animationIn={"slideInUp"}
@@ -58,12 +58,12 @@ export const CollectScreen = ({ navigation, route }) => {
                 <SafeAreaView style={[buttons, { paddingVertical: 15, height: "auto" }]}>
                     <View style={{ width: "90%", flexDirection: "column", justifyContent: "space-between", alignSelf: "center", minHeight: 110 }}>
                         <View style={{ alignContent: "center", alignItems: "center", alignSelf: "center", marginTop: 20, marginBottom: 10 }}>
-                            { title.length > 0 ? <Ionicons name='ios-cloud-offline-sharp' color={Colors.dangerColor} size={50}  /> : <MaterialIcons name='wifi-off' color={Colors.dangerColor} size={50} />}
+                            {title.length > 0 ? <Ionicons name='ios-cloud-offline-sharp' color={Colors.dangerColor} size={50} /> : <MaterialIcons name='wifi-off' color={Colors.dangerColor} size={50} />}
                         </View>
                         <>
                             <View style={{ height: "auto", marginBottom: 50 }}>
-                                <Text style={{ fontFamily: "mons-b", fontSize: Dims.titletextsize, paddingTop: 5, textAlign: "center", color: color ? color : Colors.darkColor }}>{ text }</Text>
-                                <Text style={{ fontFamily: "mons-e", fontSize: Dims.subtitletextsize, textAlign: "center", color: sColor ? sColor : Colors.darkColor, paddingTop: 10 }}>{ sText }</Text>
+                                <Text style={{ fontFamily: "mons-b", fontSize: Dims.titletextsize, paddingTop: 5, textAlign: "center", color: color ? color : Colors.darkColor }}>{text}</Text>
+                                <Text style={{ fontFamily: "mons-e", fontSize: Dims.subtitletextsize, textAlign: "center", color: sColor ? sColor : Colors.darkColor, paddingTop: 10 }}>{sText}</Text>
                             </View>
                         </>
                     </View>
@@ -73,45 +73,67 @@ export const CollectScreen = ({ navigation, route }) => {
         )
     };
 
+    const onLoadProducts = async () => {
+        onRunExternalRQST({
+            method: "GET",
+            url: '/cultures/liste'//'/collectors/load/infos/collecte'
+        }, (err, done) => {
+            setisloading(false);
+            if (done && done['status'] === 200) {
+                const { data } = done;
+                const { liste, length } = data;
+                setproducts(liste)
+
+            } else {
+                setisloading(false);
+                setisVisible(true);
+                settitle("Chargement");
+                setoutput("Les informations relative sur le marché, les produits agricoles et les pacquets n'ont pas été chargé correctement nous vous conseillons alors de réessayer le chargement de ces dernières !")
+                Toast.show({
+                    type: 'error',
+                    text1: 'Erreur de chargement des informations',
+                    text2: `Les informations n'ont pas été chargé correctement `,
+                });
+            }
+        })
+    }
+
+    const onLoadUniteMesure = async () => {
+        onRunExternalRQST({
+            method: "GET",
+            url: '/infos-marches/unite-de-mesure?page=1&limit=1000'
+        }, (err, done) => {
+            setisloading(false);
+            if (done && done['status'] === 200) {
+                const { data } = done;
+                const { rows, count } = data;
+                setunities(rows)
+            } else {
+
+                setisloading(false);
+                setisVisible(true);
+                settitle("Chargement");
+                setoutput("Les informations relative sur le marché, les produits agricoles et les pacquets n'ont pas été chargé correctement nous vous conseillons alors de réessayer le chargement de ces dernières !")
+                Toast.show({
+                    type: 'error',
+                    text1: 'Erreur de chargement des informations',
+                    text2: `Les informations n'ont pas été chargé correctement `,
+                });
+            }
+        })
+    }
+
     const onLoadGlobalinfos = async () => {
         setisVisible(false);
         setoutput("");
         settitle("");
 
         NetInfos.fetch().then(on => {
-            if(on.isConnected){
+            if (on.isConnected) {
                 setisloading(true);
-                onRunExternalRQSTE({
-                    method: "POST",
-                    url: '/produit/collecte/init'//'/collectors/load/infos/collecte'
-                }, (err, done) => {
-
-                    // if(done === undefined && err === undefined) navigation.replace("loadingsession")
-                    // console.log(" Collecte informations => ", done);
-                    // console.log(" Collecte informations error => ", err);
-
-                    if(done && done['status'] === 200){
-                        const d = done['data'];
-                        // setmarkets(d && d['marches'])
-                        setunities(d && d['unite'])
-                        setproducts(d && d['produit'])
-                        // setpackets(d && d['packets'])
-                        setisloading(false);
-
-                    }else{
-
-                        setisloading(false);
-                        setisVisible(true);
-                        settitle("Chargement");
-                        setoutput("Les informations relative sur le marché, les produits agricoles et les pacquets n'ont pas été chargé correctement nous vous conseillons alors de réessayer le chargement de ces dernières !")
-                        Toast.show({
-                            type: 'error',
-                            text1: 'Erreur de chargement des informations',
-                            text2: `Les informations n'ont pas été chargé correctement `,
-                        });
-                    }
-                })
-            }else{
+                onLoadProducts()
+                onLoadUniteMesure()
+            } else {
                 setisVisible(true);
                 settitle("")
                 Toast.show({
@@ -137,11 +159,11 @@ export const CollectScreen = ({ navigation, route }) => {
     };
 
     const handlConfirm = async () => {
-        if(produit.toString().length > 0){
-            if(unity.toString().length > 0){
-                if(price.toString().length > 0){
-                    if(currency.toString().toString().length > 0){
-                        if(comments.toString().length >= 0){
+        if (produit.toString().length > 0) {
+            if (unity.toString().length > 0) {
+                if (price.toString().length > 0) {
+                    if (currency.toString().toString().length > 0) {
+                        if (comments.toString().length >= 0) {
                             setisloading(true);
                             setoutput("");
 
@@ -156,10 +178,10 @@ export const CollectScreen = ({ navigation, route }) => {
                                             "prix": price,
                                             "devise": currency,
                                             "commentaire": comments,
-                                            "parms": Math.floor( Math.random() * ( 10 * 10 * 10 ) ) 
+                                            "parms": Math.floor(Math.random() * (10 * 10 * 10))
                                         }
                                     }, (err, done) => {
-                                        if(done){
+                                        if (done) {
                                             const s = done && done['status'];
                                             switch (s) {
                                                 case 200:
@@ -215,7 +237,7 @@ export const CollectScreen = ({ navigation, route }) => {
                                                     })
                                                     break;
                                             }
-                                        }else{
+                                        } else {
                                             setisVisible(true);
                                             console.log(err);
                                             console.log(done);
@@ -238,10 +260,10 @@ export const CollectScreen = ({ navigation, route }) => {
                                             "price": price,
                                             "currency": currency,
                                             "commentaire": comments,
-                                            "parms": Math.floor( Math.random() * ( 10 * 10 * 10 ) )                                
+                                            "parms": Math.floor(Math.random() * (10 * 10 * 10))
                                         }
                                     }, (err, done) => {
-                                        if(done){
+                                        if (done) {
                                             const s = done && done['status'];
                                             switch (s) {
                                                 case 200:
@@ -293,7 +315,7 @@ export const CollectScreen = ({ navigation, route }) => {
                                                     })
                                                     break;
                                             }
-                                        }else{
+                                        } else {
                                             setisVisible(true);
                                             setoutput("Nous avons rencotrer un problème lors du traitement de vos informations !");
                                             Toast.show({
@@ -312,14 +334,14 @@ export const CollectScreen = ({ navigation, route }) => {
                                     })
                                     break;
                             }
-                        }else{
+                        } else {
                             Toast.show({
                                 type: 'error',
                                 text1: 'Champs obligatoire',
                                 text2: `La taille du commentaire doir avoir au moins 5 catactères !`,
                             })
                         }
-                    }else{
+                    } else {
                         // alert(lg)
                         Toast.show({
                             type: 'error',
@@ -327,21 +349,21 @@ export const CollectScreen = ({ navigation, route }) => {
                             text2: `Séléctionner une dévise ( USD ou CDF )`,
                         })
                     }
-                }else{
+                } else {
                     Toast.show({
                         type: 'error',
                         text1: 'Champs obligatoire',
                         text2: `Entrer le prix du produite !`,
                     })
                 }
-            }else{
+            } else {
                 Toast.show({
                     type: 'error',
                     text1: 'Champs obligatoire',
                     text2: `Séléctionner une unité de mésure !`,
                 });
             }
-        }else{
+        } else {
             Toast.show({
                 type: 'error',
                 text1: 'Champs obligatoire',
@@ -354,28 +376,28 @@ export const CollectScreen = ({ navigation, route }) => {
         onLoadGlobalinfos()
     }, [])
 
-    return(
+    return (
         <>
-            <Title 
+            <Title
                 navigation={navigation}
-                title={"Collecte"} 
-                subtitle={"Collecte des données "} 
+                title={"Collecte"}
+                subtitle={"Collecte des données "}
             />
             <View style={{ flex: 1, backgroundColor: Colors.whiteColor, paddingTop: Dims.borderradius }}>
                 <ScrollView
                     showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{ 
+                    contentContainerStyle={{
                         paddingBottom: "100%"
                     }}
                     refreshControl={
                         <RefreshControl
-                            colors={[ Colors.primaryColor ]}
+                            colors={[Colors.primaryColor]}
                             refreshing={isloading}
                             onRefresh={onRefresh}
                         />
                     }
                 >
-                    <View style={{width: "90%", alignSelf: "center", paddingVertical: 10}}>
+                    <View style={{ width: "90%", alignSelf: "center", paddingVertical: 10 }}>
                         <Text style={{ paddingBottom: 6, marginTop: 0, fontFamily: "mons", fontSize: Dims.bigtitletextsize }}>Collecte</Text>
                         <Text style={{ fontFamily: "mons-e", fontSize: Dims.subtitletextsize }}>Formulaire de collecte des informations relatives sur les prix du marché </Text>
                     </View>
@@ -384,10 +406,10 @@ export const CollectScreen = ({ navigation, route }) => {
                     </View>
                     <View style={{ width: "90%", alignSelf: "center" }}>
                         {/* ======================================= */}
-                        <View style={{width: "100%", height: 65, flexDirection: "column", marginTop: 15}}>
-                            <Text style={{ fontFamily: "mons-b", paddingLeft: 10, color: Colors.primaryColor }}>Produit <Text style={{color: Colors.dangerColor}}>*</Text></Text>
-                            <View style={ inputGroup.container }>
-                                <View style={ inputGroup.inputcontainer }>
+                        <View style={{ width: "100%", height: 65, flexDirection: "column", marginTop: 15 }}>
+                            <Text style={{ fontFamily: "mons-b", paddingLeft: 10, color: Colors.primaryColor }}>Produit <Text style={{ color: Colors.dangerColor }}>*</Text></Text>
+                            <View style={inputGroup.container}>
+                                <View style={inputGroup.inputcontainer}>
                                     <Dropdown
                                         style={[{ width: "100%", paddingRight: 15, marginTop: 0, height: "100%", backgroundColor: Colors.pillColor }]}
                                         placeholderStyle={{ color: Colors.placeHolderColor, fontFamily: "mons", fontSize: Dims.iputtextsize, paddingLeft: 25 }}
@@ -397,8 +419,8 @@ export const CollectScreen = ({ navigation, route }) => {
                                         data={products}
                                         search
                                         value={produit}
-                                        maxHeight={ 200 }
-                                        labelField="designation"
+                                        maxHeight={200}
+                                        labelField="cultures"
                                         valueField="id"
                                         placeholder={'Séléctionner un produit'}
                                         searchPlaceholder="Recherche ..."
@@ -407,16 +429,16 @@ export const CollectScreen = ({ navigation, route }) => {
                                         }}
                                     />
                                 </View>
-                                <View style={[ inputGroup.iconcontainer, { }]}>
-                                    <Ionicons name="bookmark" size={ Dims.iconsize - 4 } color={ Colors.primaryColor } />
+                                <View style={[inputGroup.iconcontainer, {}]}>
+                                    <Ionicons name="bookmark" size={Dims.iconsize - 4} color={Colors.primaryColor} />
                                 </View>
                             </View>
                         </View>
                         {/* ======================================= */}
-                        <View style={{width: "100%", height: 65, flexDirection: "column", marginTop: 15}}>
-                            <Text style={{ fontFamily: "mons-b", paddingLeft: 10, color: Colors.primaryColor }}>Unité de mésure <Text style={{color: Colors.dangerColor}}>*</Text></Text>
-                            <View style={ inputGroup.container }>
-                                <View style={ inputGroup.inputcontainer }>
+                        <View style={{ width: "100%", height: 65, flexDirection: "column", marginTop: 15 }}>
+                            <Text style={{ fontFamily: "mons-b", paddingLeft: 10, color: Colors.primaryColor }}>Unité de mésure <Text style={{ color: Colors.dangerColor }}>*</Text></Text>
+                            <View style={inputGroup.container}>
+                                <View style={inputGroup.inputcontainer}>
                                     <Dropdown
                                         style={[{ width: "100%", paddingRight: 15, marginTop: 0, height: "100%", backgroundColor: Colors.pillColor }]}
                                         placeholderStyle={{ color: Colors.placeHolderColor, fontFamily: "mons", fontSize: Dims.iputtextsize, paddingLeft: 25 }}
@@ -425,8 +447,8 @@ export const CollectScreen = ({ navigation, route }) => {
                                         inputSearchStyle={{ backgroundColor: Colors.pillColor, height: 45, width: "95%", paddingLeft: 5, fontFamily: "mons", fontSize: Dims.iputtextsize }}
                                         data={unities}
                                         search
-                                        maxHeight={ 200 }
-                                        labelField="designation"
+                                        maxHeight={200}
+                                        labelField="name"
                                         valueField="id"
                                         placeholder={'Séléctionner une unité '}
                                         searchPlaceholder="Recherche ..."
@@ -435,31 +457,52 @@ export const CollectScreen = ({ navigation, route }) => {
                                         }}
                                     />
                                 </View>
-                                <View style={[ inputGroup.iconcontainer, { }]}>
-                                    <Ionicons name="bookmark" size={ Dims.iconsize - 4 } color={ Colors.primaryColor } />
+                                <View style={[inputGroup.iconcontainer, {}]}>
+                                    <Ionicons name="bookmark" size={Dims.iconsize - 4} color={Colors.primaryColor} />
                                 </View>
                             </View>
                         </View>
                         {/* ==================================== */}
-                        <View style={{width: "100%", height: 65, flexDirection: "column", marginTop: 15}}>
-                            <Text style={{ fontFamily: "mons-b", paddingLeft: 10, color: Colors.primaryColor }}>Prix <Text style={{color: Colors.dangerColor}}>*</Text></Text>
+                        <View style={{ width: "100%", height: 65, flexDirection: "column", marginTop: 15 }}>
                             <View style={{ flexDirection: "row" }}>
-                                <View style={{ width: "50%" }}>
-                                    <View style={[ inputGroup.container, { } ]}>
-                                        <View style={[ inputGroup.inputcontainer, { width: "100%" } ]}>
-                                            <TextInput 
-                                                value={price}
-                                                maxLength={7} 
-                                                keyboardType='numeric' 
-                                                onChangeText={e => setprice(e)} 
-                                                placeholder='Prix' style={{ color: Colors.primaryColor, backgroundColor: Colors.pillColor, height: "100%", width: "100%", paddingLeft: 25, fontFamily: "mons", fontSize: Dims.iputtextsize }} />
+                                <View style={{ width: "68%", flexDirection: "row" }}>
+                                    <View style={{ width: "49%" }}>
+                                        <Text style={{ fontFamily: "mons-b", paddingLeft: 10, color: Colors.primaryColor }}>Prix en gros <Text style={{ color: Colors.dangerColor }}>*</Text></Text>
+                                        <View style={{ width: "100%" }}>
+                                            <View style={[inputGroup.container, { width: "100%" }]}>
+                                                <View style={[inputGroup.inputcontainer, { width: "100%" }]}>
+                                                    <TextInput
+                                                        value={price}
+                                                        maxLength={7}
+                                                        keyboardType='numeric'
+                                                        onChangeText={e => setprice(e)}
+                                                        placeholder='Prix' style={{ color: Colors.primaryColor, backgroundColor: Colors.pillColor, height: "100%", width: "100%", paddingLeft: 25, fontFamily: "mons", fontSize: Dims.iputtextsize }} />
+                                                </View>
+                                            </View>
+                                        </View>
+                                    </View>
+                                    <View style={{ width: "2%" }} />
+                                    <View style={{ width: "49%" }}>
+                                        <Text style={{ fontFamily: "mons-b", paddingLeft: 10, color: Colors.primaryColor }}>Prix en détail <Text style={{ color: Colors.dangerColor }}>*</Text></Text>
+                                        <View style={{ width: "100%" }}>
+                                            <View style={[inputGroup.container, {}]}>
+                                                <View style={[inputGroup.inputcontainer, { width: "100%" }]}>
+                                                    <TextInput
+                                                        value={price}
+                                                        maxLength={7}
+                                                        keyboardType='numeric'
+                                                        onChangeText={e => setprice(e)}
+                                                        placeholder='Prix' style={{ color: Colors.primaryColor, backgroundColor: Colors.pillColor, height: "100%", width: "100%", paddingLeft: 25, fontFamily: "mons", fontSize: Dims.iputtextsize }} />
+                                                </View>
+                                            </View>
                                         </View>
                                     </View>
                                 </View>
                                 <View style={{ width: "2%" }} />
-                                <View style={{ width: "48%" }}>
-                                    <View style={ inputGroup.container }>
-                                        <View style={[ inputGroup.inputcontainer, { width: "100%" } ]}>
+                                <View style={{ width: "30%" }}>
+                                    <Text style={{ fontFamily: "mons-b", paddingLeft: 10, color: Colors.primaryColor }}>Dévise <Text style={{ color: Colors.dangerColor }}>*</Text></Text>
+                                    <View style={inputGroup.container}>
+                                        <View style={[inputGroup.inputcontainer, { width: "100%" }]}>
                                             <Dropdown
                                                 style={[{ width: "100%", paddingRight: 15, marginTop: 0, height: "100%", backgroundColor: Colors.pillColor }]}
                                                 placeholderStyle={{ color: Colors.placeHolderColor, fontFamily: "mons", fontSize: Dims.iputtextsize, paddingLeft: 25 }}
@@ -468,10 +511,10 @@ export const CollectScreen = ({ navigation, route }) => {
                                                 inputSearchStyle={{ backgroundColor: Colors.pillColor, height: 45, width: "95%", paddingLeft: 5, fontFamily: "mons", fontSize: Dims.iputtextsize }}
                                                 data={currencies}
                                                 // search
-                                                maxHeight={ 200 }
+                                                maxHeight={200}
                                                 labelField="designation"
-                                                valueField="id"
-                                                placeholder={'Dévise... '}
+                                                valueField="designation"
+                                                placeholder={'Dévi.'}
                                                 searchPlaceholder="Recherche ..."
                                                 onChange={item => {
                                                     setcurrency(item.designation)
@@ -486,37 +529,37 @@ export const CollectScreen = ({ navigation, route }) => {
                             </View>
                         </View>
                         {/* ======================================= */}
-                        <View style={{width: "100%", height: "auto", flexDirection: "column", marginTop: 15}}>
+                        <View style={{ width: "100%", height: "auto", flexDirection: "column", marginTop: 15 }}>
                             <Text style={{ fontFamily: "mons-b", paddingLeft: 10, color: Colors.primaryColor }}>Commentaire </Text>
                             <View style={[inputGroup.container, { height: 100 }]}>
                                 <View style={[inputGroup.inputcontainer, { flexDirection: "row-reverse", height: 100 }]}>
-                                    <TextInput 
+                                    <TextInput
                                         keyboardType='ascii-capable'
                                         onChangeText={t => setcomments(t)}
                                         // value={phone}
                                         // maxLength={9}
                                         multiline
-                                        placeholder='Entrer un commentaire ou une description ...' 
-                                        style={{ backgroundColor: Colors.pillColor, height: "100%", width: "100%", paddingLeft: 25, fontFamily: "mons", fontSize: Dims.iputtextsize, color: Colors.primaryColor }} 
+                                        placeholder='Entrer un commentaire ou une description ...'
+                                        style={{ backgroundColor: Colors.pillColor, height: "100%", width: "100%", paddingLeft: 25, fontFamily: "mons", fontSize: Dims.iputtextsize, color: Colors.primaryColor }}
                                     />
                                 </View>
-                                <View style={[ inputGroup.iconcontainer, {  }]}>
-                                    <Entypo name="edit" size={ Dims.iconsize - 4 } color={ Colors.primaryColor } />
+                                <View style={[inputGroup.iconcontainer, {}]}>
+                                    <Entypo name="edit" size={Dims.iconsize - 4} color={Colors.primaryColor} />
                                 </View>
                             </View>
                         </View>
                         {/* ======================================= */}
                         <View style={{ width: "100%", height: 65, flexDirection: "column", marginTop: 25 }}>
-                            <TouchableHighlight 
+                            <TouchableHighlight
                                 onPress={handlConfirm}
-                                underlayColor={ Colors.primaryColor }
+                                underlayColor={Colors.primaryColor}
                                 style={[btn]}
                             >
-                                {isloading 
-                                ?
+                                {isloading
+                                    ?
                                     <Loader />
-                                :
-                                    <Text style={{ color: Colors.whiteColor, fontFamily: "mons-b" }}>Confirmer</Text>    
+                                    :
+                                    <Text style={{ color: Colors.whiteColor, fontFamily: "mons-b" }}>Confirmer</Text>
                                 }
                             </TouchableHighlight>
                         </View>
@@ -524,18 +567,18 @@ export const CollectScreen = ({ navigation, route }) => {
                 </ScrollView>
             </View>
             <BottomSheetDialog
-                navigation={navigation} 
-                visible={isVisible} 
+                navigation={navigation}
+                visible={isVisible}
                 title={
                     {
-                        color: Colors.dangerColor, 
+                        color: Colors.dangerColor,
                         text: title.length > 0 ? title : "Connectivité"
                     }
-                } 
+                }
                 subTitle={
-                    { 
-                        sColor: Colors.darkColor, 
-                        sText: output.length > 0 ? output : "Il semble que vous n'êtes pas connectez sur internet, vos informations peuvent être enregistrées en local; vous pouvew faire la synchronisation plus tard" 
+                    {
+                        sColor: Colors.darkColor,
+                        sText: output.length > 0 ? output : "Il semble que vous n'êtes pas connectez sur internet, vos informations peuvent être enregistrées en local; vous pouvew faire la synchronisation plus tard"
                     }
                 }
             />
