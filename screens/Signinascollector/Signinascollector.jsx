@@ -83,7 +83,7 @@ export const SigninAsCollectorScreen = ({ navigation, route }) => {
                                                 table: "__tbl_user",
                                                 columns: `'realid', 'nom', 'postnom', 'prenom', 'datenaissance', 'email', 'phone', 'adresse', 'genre', 'idvillage', 'crearedon', 'iscollector'`,
                                                 dot: "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?",
-                                                values: [`${u['id']}`, `${u['nom']}`, `${u['postnom']}`, `${u['prenom']}`, `${u['datenaissance']}`, `${u['email']}`, `${u['phone']}`, `${u['adresse']}`, `${u['genre']}`, `${u['idvillage']}`, `${new Date().toLocaleString()}`, 0]
+                                                values: [`${u['id']}`, `${u['nom']}`, `${u['postnom']}`, `${u['prenom']}`, `${u['datenaissance']}`, `${u['email']}`, `${u['phone']}`, `${u['adresse']}`, `${u['genre']}`, `${u['idvillage']}`, `${new Date().toLocaleString()}`, 1]
                                             }, (err, insert) => {
                                                 if(insert){
                                                     localStorageSAVE({

@@ -96,11 +96,10 @@ export const HomeScreen = ({ navigation }) => {
 
     const onLoadCollections = async () => {
         setisloading(true)
-        await onRunExternalRQSTE({
-            method: "POST",
-            url: `/produit/collecte/liste/by-collecteur`
+        await onRunExternalRQST({
+            method: "GET",
+            url: `/infos-marches/collecte-user/${parseInt(user && user['realid'])}?status=0`
         }, (er, done) => {
-            console.log(" Liste collection => ", done);
             if(done && done['status'] === 200){
                 setisloading(false)
                 setcollections(done && done['data']);

@@ -23,7 +23,7 @@ export const DetailsCollectionScreen = ({ navigation, route }) => {
 
     return(
         <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
-            <Title title={`${item && item['categorie']}  >  ${item && item['produit']}`} subtitle={"Détail d'une collection"} navigation={navigation} /> 
+            <Title title={`Collection`} subtitle={"Détail d'une collection"} navigation={navigation} /> 
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingBottom: "50%" }}
