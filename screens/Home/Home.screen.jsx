@@ -39,10 +39,10 @@ export const HomeScreen = ({ navigation }) => {
             url: `/agriculteurs/liste/${parseInt(user && user['realid'])}`
         }, (er, done) => {
             // console.log(done);
-            if(done && done['status'] === 200){
+            if (done && done['status'] === 200) {
                 setisloading(false)
                 setculvs(done && done['data']);
-            }else{
+            } else {
                 setisloading(false)
             }
         })
@@ -54,10 +54,10 @@ export const HomeScreen = ({ navigation }) => {
             method: "GET",
             url: `/souscriptions/liste/${user && user['realid']}`
         }, (er, done) => {
-            if(done && done['status'] === 200){
+            if (done && done['status'] === 200) {
                 setisloading(false)
                 setsousc(done && done['data']);
-            }else{
+            } else {
                 setisloading(false)
             }
         })
@@ -69,10 +69,10 @@ export const HomeScreen = ({ navigation }) => {
             method: "GET",
             url: `/paiements/paiement/get/package/ambassador/${user && user['realid']}`
         }, (e, done) => {
-            if(done && done['status'] === 200){
+            if (done && done['status'] === 200) {
                 setisloading(false);
                 setpacks(done && done['data'] && done['data']['package'] ? done['data']['package'] : 0);
-            }else{
+            } else {
                 setpacks(0);
                 setisloading(false);
             }
@@ -85,10 +85,10 @@ export const HomeScreen = ({ navigation }) => {
             method: "GET",
             url: `/champs/liste/${parseInt(user && user['realid'])}`
         }, (er, done) => {
-            if(done && done['status'] === 200){
+            if (done && done['status'] === 200) {
                 setisloading(false)
                 setchamps(done && done['data']);
-            }else{
+            } else {
                 setisloading(false)
             }
         })
@@ -100,11 +100,13 @@ export const HomeScreen = ({ navigation }) => {
             method: "GET",
             url: `/infos-marches/collecte-user/${parseInt(user && user['realid'])}?status=0`
         }, (er, done) => {
-            if(done && done['status'] === 200){
+            console.log(done, er);
+            if (done && done['status'] === 200) {
                 setisloading(false)
                 setcollections(done && done['data']);
-            }else{
+            } else {
                 setisloading(false)
+                setcollections([])
             }
         })
     };
@@ -128,13 +130,13 @@ export const HomeScreen = ({ navigation }) => {
     // ================= loadng info according to ambassador =====
     const __ = async () => {
         NetInfos.fetch().then(state => {
-            if(state.isConnected){
+            if (state.isConnected) {
                 setisVisible(false);
                 loadChamps();
                 loadSouscriptions();
                 loadCultivateurs();
                 loadPaquets();
-            }else{
+            } else {
                 setisVisible(true);
                 Toast.show({
                     type: 'error',
@@ -147,13 +149,13 @@ export const HomeScreen = ({ navigation }) => {
 
     // ================ loading information acconding to collector ====
     const ___ = async () => {
-        // alert(1)
+        alert(1)
         onLoadCollections()
         onLoadAbonnement()
     };
 
     const BottomSheetDialog = ({ navigation, visible, title: { text, color }, subTitle: { sText, sColor } }) => {
-        return(
+        return (
             <Modal
                 isVisible={visible}
                 animationIn={"slideInUp"}
@@ -169,8 +171,8 @@ export const HomeScreen = ({ navigation }) => {
                         </View>
                         <>
                             <View style={{ height: 55, marginBottom: 20 }}>
-                                <Text style={{ fontFamily: "mons", fontSize: Dims.titletextsize, paddingTop: 5, textAlign: "center", color: color ? color : Colors.darkColor }}>{ text }</Text>
-                                <Text style={{ fontFamily: "mons-e", fontSize: Dims.subtitletextsize, textAlign: "center", color: sColor ? sColor : Colors.darkColor, paddingTop: 10 }}>{ sText }</Text>
+                                <Text style={{ fontFamily: "mons", fontSize: Dims.titletextsize, paddingTop: 5, textAlign: "center", color: color ? color : Colors.darkColor }}>{text}</Text>
+                                <Text style={{ fontFamily: "mons-e", fontSize: Dims.subtitletextsize, textAlign: "center", color: sColor ? sColor : Colors.darkColor, paddingTop: 10 }}>{sText}</Text>
                             </View>
                         </>
                     </View>
@@ -182,24 +184,24 @@ export const HomeScreen = ({ navigation }) => {
 
     // ======================== AS Ambassador case ===========
     const AsAmbassadeurCase = () => {
-        return(
-            <ScrollView 
+        return (
+            <ScrollView
                 refreshControl={
-                    <RefreshControl 
+                    <RefreshControl
                         onRefresh={__}
                         refreshing={isloading}
-                        colors={[ Colors.primaryColor ]}
+                        colors={[Colors.primaryColor]}
                     />
                 }
-                contentContainerStyle={{ paddingBottom: "100%"  }}
-                style={{  }}
+                contentContainerStyle={{ paddingBottom: "100%" }}
+                style={{}}
                 showsVerticalScrollIndicator={false}
             >
                 <View style={{ width: "90%", alignSelf: "center", marginBottom: 10 }}>
                     <Divider />
                 </View>
                 <>
-                    <View style={{width: "90%", alignSelf: "center", marginBottom: 10}}>
+                    <View style={{ width: "90%", alignSelf: "center", marginBottom: 10 }}>
                         <Text style={[shadow, { paddingBottom: 6, marginTop: 0, fontFamily: "mons", fontSize: Dims.bigtitletextsize, color: Colors.whiteColor }]}>Activités</Text>
                         <Text style={[shadow, { fontFamily: "mons", fontSize: Dims.subtitletextsize, color: Colors.whiteColor }]}>Séction l'évolutions des vos activités </Text>
                     </View>
@@ -208,18 +210,18 @@ export const HomeScreen = ({ navigation }) => {
                         <View style={{ flexDirection: "row", paddingHorizontal: 10, alignContent: "center", alignItems: "center", justifyContent: "space-around" }}>
 
                             <TouchableHighlight
-                                underlayColor={ Colors.primaryColor }
-                                onPress={() => navigation.navigate("listeagr", { liste: culvs })} 
+                                underlayColor={Colors.primaryColor}
+                                onPress={() => navigation.navigate("listeagr", { liste: culvs })}
                                 style={[card, { backgroundColor: Colors.whiteColor }]}
                             >
                                 <View style={{ width: "100%", height: "100%", backgroundColor: Colors.primaryColor, padding: Dims.paddingCard }}>
                                     <Text style={[{ fontFamily: "mons-b", color: Colors.whiteColor, fontSize: 9 }, shadow]} allowFontScaling={false}>Nbr.&nbsp; d'agriculteurs</Text>
-                                    {isloading 
-                                    ? 
+                                    {isloading
+                                        ?
                                         (
                                             <Loader size={10} color={Colors.whiteColor} />
                                         )
-                                    : 
+                                        :
                                         (
                                             <Text style={{ fontFamily: "mons", fontSize: Dims.fontSizeCard - 4, color: Colors.whiteColor }}>
                                                 {culvs && culvs.hasOwnProperty("length") ? culvs['length'] : "---"}
@@ -229,22 +231,22 @@ export const HomeScreen = ({ navigation }) => {
                                 </View>
                             </TouchableHighlight>
 
-                            <TouchableHighlight 
-                                underlayColor={ Colors.primaryColor }
-                                onPress={() => { 
-                                        navigation.navigate("listesousc", { liste: sousc }) 
-                                    } 
-                                } 
+                            <TouchableHighlight
+                                underlayColor={Colors.primaryColor}
+                                onPress={() => {
+                                    navigation.navigate("listesousc", { liste: sousc })
+                                }
+                                }
                                 style={[card, { backgroundColor: Colors.whiteColor }]}
                             >
                                 <View style={{ width: "100%", height: "100%", backgroundColor: Colors.primaryColor, padding: Dims.paddingCard }}>
                                     <Text style={[{ fontFamily: "mons-b", color: Colors.whiteColor, fontSize: 9 }, shadow]} allowFontScaling={false} >Nbr.&nbsp; d'abonnements</Text>
-                                    {isloading 
-                                    ? 
+                                    {isloading
+                                        ?
                                         (
                                             <Loader size={10} color={Colors.whiteColor} />
                                         )
-                                    :
+                                        :
                                         (
                                             <Text style={{ fontFamily: "mons", fontSize: Dims.fontSizeCard - 4, color: Colors.whiteColor }}>
                                                 {sousc && sousc.hasOwnProperty("length") ? sousc['length'] : "---"}
@@ -257,19 +259,19 @@ export const HomeScreen = ({ navigation }) => {
                         {/* ----------------------------------------- */}
                         <View style={{ flexDirection: "row", paddingHorizontal: 10, alignContent: "center", alignItems: "center", justifyContent: "space-around", marginTop: 15 }}>
 
-                            <TouchableHighlight 
-                                underlayColor={ Colors.primaryColor }
+                            <TouchableHighlight
+                                underlayColor={Colors.primaryColor}
                                 onPress={() => navigation.navigate("listechamps", { liste: champs })}
                                 style={[card, { backgroundColor: Colors.whiteColor }]}
                             >
                                 <View style={{ width: "100%", height: "100%", backgroundColor: Colors.primaryColor, padding: Dims.paddingCard }}>
                                     <Text style={[{ fontFamily: "mons-b", color: Colors.whiteColor, fontSize: 9 }, shadow]} allowFontScaling={false}>Nbr.&nbsp; de champs</Text>
-                                    {isloading 
-                                    ? 
+                                    {isloading
+                                        ?
                                         (
                                             <Loader size={10} color={Colors.whiteColor} />
                                         )
-                                    :  
+                                        :
                                         (
                                             <Text style={{ fontFamily: "mons", fontSize: Dims.fontSizeCard - 4, color: Colors.whiteColor }}>
                                                 {champs && champs.hasOwnProperty("length") ? champs['length'] : "---"}
@@ -280,26 +282,26 @@ export const HomeScreen = ({ navigation }) => {
                             </TouchableHighlight>
 
                             <TouchableHighlight
-                                underlayColor={ Colors.primaryColor }
+                                underlayColor={Colors.primaryColor}
 
                                 style={[card, { backgroundColor: Colors.primaryColor }]}
                             >
                                 <View style={{ width: "100%", height: "100%", backgroundColor: Colors.whiteColor, padding: Dims.paddingCard }}>
                                     <Text style={[{ fontFamily: "mons-b", color: Colors.primaryColor, fontSize: 9 }, shadow]} allowFontScaling={false} >Mes paquets</Text>
-                                    {isloading 
-                                    ? 
+                                    {isloading
+                                        ?
                                         (
                                             <Loader size={10} color={Colors.primaryColor} />
                                         )
-                                    : 
+                                        :
                                         (
                                             <View>
                                                 <Text style={{ fontFamily: "mons", fontSize: Dims.fontSizeCard - 4, color: Colors.primaryColor }}>
                                                     {packs}
-                                                    {packs > 0 && 
+                                                    {packs > 0 &&
                                                         (
                                                             <Text style={{ fontSize: Dims.subtitletextsize - 2, fontFamily: "mons-b" }}>
-                                                            &nbsp; ( {packs * 30} SMS )
+                                                                &nbsp; ( {packs * 30} SMS )
                                                             </Text>
                                                         )
                                                     }
@@ -313,10 +315,10 @@ export const HomeScreen = ({ navigation }) => {
                     </View>
                 </>
                 <View style={{ width: "90%", alignSelf: "center", marginBottom: 10, marginTop: 20 }}>
-                    <Divider/>
+                    <Divider />
                 </View>
                 <>
-                    <View style={{width: "90%", alignSelf: "center", paddingLeft: 0}}>
+                    <View style={{ width: "90%", alignSelf: "center", paddingLeft: 0 }}>
                         <Text style={[shadow, { paddingBottom: 6, marginTop: 0, fontFamily: "mons", fontSize: Dims.bigtitletextsize, color: Colors.whiteColor }]}>Accès direct</Text>
                         <Text style={[shadow, { fontFamily: "mons", fontSize: Dims.subtitletextsize, color: Colors.whiteColor }]}>Boutons et accès directe aux fonctionnalités </Text>
                     </View>
@@ -339,7 +341,7 @@ export const HomeScreen = ({ navigation }) => {
                         >
                             <>
                                 <View style={{ backgroundColor: Colors.primaryColor, padding: 2 }}>
-                                    <MaterialIcons name="add" size={ Dims.iconsize } color={Colors.whiteColor} />
+                                    <MaterialIcons name="add" size={Dims.iconsize} color={Colors.whiteColor} />
                                 </View>
                                 <Text style={{ paddingLeft: 10, fontFamily: "mons-e", color: Colors.whiteColor, fontSize: Dims.subtitletextsize }}>Abonnement | <Text style={{ color: Colors.whiteColor, fontFamily: "mons-b" }}>prix du marché</Text></Text>
                             </>
@@ -362,7 +364,7 @@ export const HomeScreen = ({ navigation }) => {
                         >
                             <>
                                 <View style={{ backgroundColor: Colors.primaryColor, padding: 2 }}>
-                                    <MaterialIcons name="add" size={ Dims.iconsize } color={Colors.whiteColor} />
+                                    <MaterialIcons name="add" size={Dims.iconsize} color={Colors.whiteColor} />
                                 </View>
                                 <Text style={{ paddingLeft: 10, fontFamily: "mons-e", color: Colors.whiteColor, fontSize: Dims.subtitletextsize }}>Abonnement |  <Text style={{ color: Colors.whiteColor, fontFamily: "mons-b" }}>Météo</Text></Text>
                             </>
@@ -385,7 +387,7 @@ export const HomeScreen = ({ navigation }) => {
                         >
                             <>
                                 <View style={{ backgroundColor: Colors.primaryColor, padding: 2 }}>
-                                    <MaterialIcons name="add" size={ Dims.iconsize } color={Colors.whiteColor} />
+                                    <MaterialIcons name="add" size={Dims.iconsize} color={Colors.whiteColor} />
                                 </View>
                                 <Text style={{ paddingLeft: 10, fontFamily: "mons-e", color: Colors.whiteColor, fontSize: Dims.subtitletextsize }}>Abonnement |  <Text style={{ color: Colors.whiteColor, fontFamily: "mons-b" }}>Conseils agricoles</Text></Text>
                             </>
@@ -407,7 +409,7 @@ export const HomeScreen = ({ navigation }) => {
                             }}
                         >
                             <>
-                                <AntDesign name="adduser" size={ Dims.iconsize } color={Colors.primaryColor} />
+                                <AntDesign name="adduser" size={Dims.iconsize} color={Colors.primaryColor} />
                                 <Text style={{ paddingLeft: 10, fontFamily: "mons-b", color: Colors.primaryColor, fontSize: Dims.subtitletextsize }}>Ajouter un agriculteur</Text>
                             </>
                         </TouchableHighlight>
@@ -428,7 +430,7 @@ export const HomeScreen = ({ navigation }) => {
                             }}
                         >
                             <>
-                                <MaterialIcons name="leak-add" size={ Dims.iconsize } color={Colors.primaryColor} />
+                                <MaterialIcons name="leak-add" size={Dims.iconsize} color={Colors.primaryColor} />
                                 <Text style={{ paddingLeft: 10, fontFamily: "mons-b", color: Colors.primaryColor, fontSize: Dims.subtitletextsize }}>Ajouter un champs</Text>
                             </>
                         </TouchableHighlight>
@@ -453,22 +455,22 @@ export const HomeScreen = ({ navigation }) => {
                                 <Text style={{ paddingLeft: 10, fontFamily: "mons", color: Colors.darkColor }}>Ajout d'une zône de production</Text>
                             </>
                         </TouchableHighlight> */}
-                        
+
                     </View>
                 </>
                 <BottomSheetDialog
-                    navigation={navigation} 
-                    visible={isVisible} 
+                    navigation={navigation}
+                    visible={isVisible}
                     title={
                         {
-                            color: Colors.dangerColor, 
+                            color: Colors.dangerColor,
                             text: "Connectivité"
                         }
-                    } 
+                    }
                     subTitle={
-                        { 
-                            sColor: Colors.darkColor, 
-                            sText: output.length > 0 ? output : "Il semble que vous n'êtes pas connectez sur internet, vos informations peuvent être enregistrées en local; vous pouvew faire la synchronisation plus tard" 
+                        {
+                            sColor: Colors.darkColor,
+                            sText: output.length > 0 ? output : "Il semble que vous n'êtes pas connectez sur internet, vos informations peuvent être enregistrées en local; vous pouvew faire la synchronisation plus tard"
                         }
                     }
                 />
@@ -478,26 +480,26 @@ export const HomeScreen = ({ navigation }) => {
 
     // ======================== AS collector case ===========
     const AsCollectorCase = () => {
-        return(
-            <ScrollView 
+        return (
+            <ScrollView
                 refreshControl={
-                    <RefreshControl 
+                    <RefreshControl
                         onRefresh={() => {
                             ___()
                         }}
                         refreshing={isloading}
-                        colors={[ Colors.primaryColor ]}
+                        colors={[Colors.primaryColor]}
                     />
                 }
                 contentContainerStyle={{ paddingBottom: "100%" }}
-                style={{  }}
+                style={{}}
                 showsVerticalScrollIndicator={false}
             >
                 <View style={{ width: "90%", alignSelf: "center", marginBottom: 10 }}>
                     <Divider />
                 </View>
                 <>
-                    <View style={{width: "90%", alignSelf: "center", marginBottom: 10}}>
+                    <View style={{ width: "90%", alignSelf: "center", marginBottom: 10 }}>
                         <Text style={[shadow, { paddingBottom: 6, marginTop: 0, fontFamily: "mons", fontSize: Dims.bigtitletextsize, color: Colors.whiteColor }]}>Activités</Text>
                         <Text style={[shadow, { fontFamily: "mons", fontSize: Dims.subtitletextsize, color: Colors.whiteColor }]}>Séction l'évolutions des vos activités </Text>
                     </View>
@@ -506,20 +508,20 @@ export const HomeScreen = ({ navigation }) => {
                         <View style={{ flexDirection: "row", paddingHorizontal: 10, alignContent: "center", alignItems: "center", justifyContent: "space-around" }}>
 
                             <TouchableHighlight
-                                underlayColor={ Colors.primaryColor }
+                                underlayColor={Colors.primaryColor}
                                 onPress={() => {
                                     navigation.navigate("listecollections", { liste: collections })
-                                }} 
+                                }}
                                 style={[card, { backgroundColor: Colors.whiteColor }]}
                             >
                                 <View style={{ width: "100%", height: "100%", backgroundColor: Colors.primaryColor, padding: Dims.paddingCard }}>
                                     <Text style={[{ fontFamily: "mons-b", color: Colors.whiteColor, fontSize: 9 }, shadow]} allowFontScaling={false}>Nbr.&nbsp; des collections</Text>
-                                    {isloading 
-                                    ? 
+                                    {isloading
+                                        ?
                                         (
                                             <Loader size={10} color={Colors.whiteColor} />
                                         )
-                                    : 
+                                        :
                                         (
                                             <Text style={{ fontFamily: "mons", fontSize: Dims.fontSizeCard - 4, color: Colors.whiteColor }}>
                                                 {collections && collections.hasOwnProperty("length") ? collections['length'] : "---"}
@@ -529,22 +531,22 @@ export const HomeScreen = ({ navigation }) => {
                                 </View>
                             </TouchableHighlight>
 
-                            <TouchableHighlight 
-                                underlayColor={ Colors.primaryColor }
-                                onPress={() => { 
-                                        // navigation.navigate("listesousc", { liste: sousc }) 
-                                    } 
-                                } 
+                            <TouchableHighlight
+                                underlayColor={Colors.primaryColor}
+                                onPress={() => {
+                                    // navigation.navigate("listesousc", { liste: sousc }) 
+                                }
+                                }
                                 style={[card, { backgroundColor: Colors.whiteColor }]}
                             >
                                 <View style={{ width: "100%", height: "100%", backgroundColor: Colors.primaryColor, padding: Dims.paddingCard }}>
                                     <Text style={[{ fontFamily: "mons-b", color: Colors.whiteColor, fontSize: 9 }, shadow]} allowFontScaling={false} >Nbr.&nbsp; d'abonnements</Text>
-                                    {isloading 
-                                    ? 
+                                    {isloading
+                                        ?
                                         (
                                             <Loader size={10} color={Colors.whiteColor} />
                                         )
-                                    :
+                                        :
                                         (
                                             <Text style={{ fontFamily: "mons", fontSize: Dims.fontSizeCard - 4, color: Colors.whiteColor }}>
                                                 {sousc && sousc.hasOwnProperty("length") ? sousc['length'] : "---"}
@@ -613,10 +615,10 @@ export const HomeScreen = ({ navigation }) => {
                     </View>
                 </>
                 <View style={{ width: "90%", alignSelf: "center", marginBottom: 10, marginTop: 20 }}>
-                    <Divider/>
+                    <Divider />
                 </View>
                 <>
-                    <View style={{width: "90%", alignSelf: "center", paddingLeft: 0}}>
+                    <View style={{ width: "90%", alignSelf: "center", paddingLeft: 0 }}>
                         <Text style={[shadow, { paddingBottom: 6, marginTop: 0, fontFamily: "mons", fontSize: Dims.bigtitletextsize, color: Colors.whiteColor }]}>Accès direct</Text>
                         <Text style={[shadow, { fontFamily: "mons", fontSize: Dims.subtitletextsize, color: Colors.whiteColor }]}>Boutons et accès directe aux fonctionnalités </Text>
                     </View>
@@ -662,7 +664,7 @@ export const HomeScreen = ({ navigation }) => {
                         >
                             <>
                                 <View style={{ backgroundColor: Colors.primaryColor, padding: 2 }}>
-                                    <MaterialIcons name="add" size={ Dims.iconsize } color={Colors.whiteColor} />
+                                    <MaterialIcons name="add" size={Dims.iconsize} color={Colors.whiteColor} />
                                 </View>
                                 <Text style={{ paddingLeft: 10, fontFamily: "mons-b", color: Colors.whiteColor }}>Nouvelle collecte</Text>
                             </>
@@ -730,22 +732,22 @@ export const HomeScreen = ({ navigation }) => {
                                 <Text style={{ paddingLeft: 10, fontFamily: "mons", color: Colors.darkColor }}>Ajout d'une zône de production</Text>
                             </>
                         </TouchableHighlight> */}
-                        
+
                     </View>
                 </>
                 <BottomSheetDialog
-                    navigation={navigation} 
-                    visible={isVisible} 
+                    navigation={navigation}
+                    visible={isVisible}
                     title={
                         {
-                            color: Colors.dangerColor, 
+                            color: Colors.dangerColor,
                             text: "Connectivité"
                         }
-                    } 
+                    }
                     subTitle={
-                        { 
-                            sColor: Colors.darkColor, 
-                            sText: output.length > 0 ? output : "Il semble que vous n'êtes pas connectez sur internet, vos informations peuvent être enregistrées en local; vous pouvew faire la synchronisation plus tard" 
+                        {
+                            sColor: Colors.darkColor,
+                            sText: output.length > 0 ? output : "Il semble que vous n'êtes pas connectez sur internet, vos informations peuvent être enregistrées en local; vous pouvew faire la synchronisation plus tard"
                         }
                     }
                 />
@@ -758,34 +760,34 @@ export const HomeScreen = ({ navigation }) => {
         GLOBAL.ScreenGlobal.setState({
             navigation: navigation
         });
-        
+
         NetInfos.addEventListener(on => {
-            if(on.isConnected){
-                if(init === 0) __()
+            if (on.isConnected) {
+                if (init === 0) __()
                 else ___();
-            }else setisVisible(true)
+            } else setisVisible(true)
         });
 
-    }, [ GLOBAL ]);
+    }, [GLOBAL]);
 
-    return(
+    return (
         <>
-            <StatusBar barStyle={"light-content"} backgroundColor={ Colors.primaryColor } />
+            <StatusBar barStyle={"light-content"} backgroundColor={Colors.primaryColor} />
             <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
                 <LinearGradient
-                    colors={[ Colors.primaryColor, Colors.whiteColor ]}
-                    style={{height: "90%", width: "100%" }}
+                    colors={[Colors.primaryColor, Colors.whiteColor]}
+                    style={{ height: "90%", width: "100%" }}
                 />
-                <View 
+                <View
                     style={{ position: "absolute", width: "100%", height: Dims.height }}
                 >
                     <View>
                         <View style={{ width: "100%", alignSelf: "center", padding: 20, flexDirection: "row", alignItems: "center", top: -20, justifyContent: "center" }}>
                             <View>
-                                <Image 
-                                    source={require("../../assets/images/HewAgri_Icon-5.png")} 
+                                <Image
+                                    source={require("../../assets/images/HewAgri_Icon-5.png")}
                                     style={{ width: 70, height: 70, resizeMode: "cover" }}
-                                    // PlaceholderContent={ <Loader color={Colors.whiteColor} size={12} /> } 
+                                // PlaceholderContent={ <Loader color={Colors.whiteColor} size={12} /> } 
                                 />
                             </View>
                             <View style={{ paddingBottom: 1 }}>
@@ -803,7 +805,7 @@ export const HomeScreen = ({ navigation }) => {
                         {init === 1 && (<AsCollectorCase />)}
                     </View>
                 </View>
-            </View> 
+            </View>
             <SpeedDialCustomer />
         </>
     )

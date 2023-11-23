@@ -14,7 +14,7 @@ axios.interceptors.request.use(async config => {
         config.headers.apikey = "$2b$10$AS6GbX37SkQS6skhMOYjveDOuUUgvGz9dvsrCbeylWl/SwMkDDp2G";
         config.headers.apikeyaccess = "kivugreen@api2022";
         config.headers['x-connexion-hewagri-origin-mob'] = true;
-        config.headers['x-connexion-hewagri'] = data.trim();
+        config.headers['x-connexion-hewagri'] = data.trim() || "$2b$10$AS6GbX37SkQS6skhMOYjveDOuUUgvGz9dvsrCbeylWl/SwMkDDp2G";
     }
     return { ...config, signal: controller.signal };
 }, rejected => {

@@ -21,33 +21,33 @@ export const DetailsCollectionScreen = ({ navigation, route }) => {
     React.useEffect(() => {
     }, [])
 
-    return(
+    return (
         <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
-            <Title title={`Collection`} subtitle={"Détail d'une collection"} navigation={navigation} /> 
+            <Title title={`Collection`} subtitle={"Détail d'une collection"} navigation={navigation} />
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingBottom: "50%" }}
             >
                 <View style={{ marginHorizontal: 5 }}>
                     <View style={
-                        { 
-                            padding: 10, 
-                            borderRadius: 10, 
-                            backgroundColor: Colors.whiteColor, 
-                            marginTop: (Dims.iconsize * 2), 
-                            borderTopColor: Colors.primaryColor, 
-                            borderTopWidth: .5 
+                        {
+                            padding: 10,
+                            borderRadius: 10,
+                            backgroundColor: Colors.whiteColor,
+                            marginTop: (Dims.iconsize * 2),
+                            borderTopColor: Colors.primaryColor,
+                            borderTopWidth: .5
                         }
                     }>
-                        <View style={{ position: "absolute", top: - ( Dims.iconsize / 1 ), padding: 2, marginLeft: 10 }}>
+                        <View style={{ position: "absolute", top: - (Dims.iconsize / 1), padding: 2, marginLeft: 10 }}>
                             <FontAwesome name="bookmark" size={Dims.iconsize * 2} color={Colors.primaryColor} />
                         </View>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: Dims.iconsize }}>
-                            <View style={{ width: "25%",  alignContent: "flex-start", alignItems: "flex-start", padding: 2, paddingVertical: 10, }}>
+                            <View style={{ width: "25%", alignContent: "flex-start", alignItems: "flex-start", padding: 2, paddingVertical: 10, }}>
                                 <Text style={{ fontFamily: "mons-e", textAlign: "left" }}>Catégorie</Text>
-                                <Text style={{ fontFamily: "mons-b",textAlign: "left", fontSize: Dims.subtitletextsize, color: Colors.primaryColor }}>{item && item['categorie']}</Text>
+                                <Text style={{ fontFamily: "mons-b", textAlign: "left", fontSize: Dims.subtitletextsize, color: Colors.primaryColor }}>{item && item['categorie']}</Text>
                             </View>
-                            <View style={{ width: "25%",  alignContent: "center", alignItems: "center", padding: 2, paddingVertical: 10, }}>
+                            <View style={{ width: "25%", alignContent: "center", alignItems: "center", padding: 2, paddingVertical: 10, }}>
                                 <Text style={{ fontFamily: "mons-e", textAlign: "center" }}>Marché</Text>
                                 <Text style={{ fontFamily: "mons-b", textAlign: "center", fontSize: Dims.subtitletextsize, color: Colors.primaryColor }}>{item && item['marche']}</Text>
                             </View>
@@ -67,7 +67,7 @@ export const DetailsCollectionScreen = ({ navigation, route }) => {
                             <Text style={{ fontFamily: "mons-e", paddingBottom: 5 }}>Date de collecte</Text>
                             <Text style={{ fontFamily: "mons-b", color: Colors.darkColor }}>{item && item['createAt'] ? item['createAt'] : "---"}</Text>
                         </View>
-                        <View style={{ padding: 2, marginBottom: 20  }}>
+                        <View style={{ padding: 2, marginBottom: 20 }}>
                             <Text style={{ fontFamily: "mons-e", paddingBottom: 5 }}>Commentaire</Text>
                             <Text style={{ fontFamily: "mons-b", color: Colors.darkColor }}>{item && item['description'] ? item['description'] : "---"}</Text>
                         </View>

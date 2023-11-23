@@ -93,13 +93,13 @@ export const SigninScreen = ({ navigation, route }) => {
 
                                                         localStorageSAVE({
                                                             data: insert,
-                                                            expires: sessionExpires,
+                                                            expires: null, // sessionExpires
                                                             key: keys['loginState']
                                                         }, (er, ok) => {
                                                             if (ok) {
                                                                 localStorageSAVE({
                                                                     data: `Bearer ${token}`,
-                                                                    expires: sessionExpires,
+                                                                    expires: null, // sessionExpires
                                                                     key: keys['token']
                                                                 }, (er_, dn) => {
                                                                     if (dn) {

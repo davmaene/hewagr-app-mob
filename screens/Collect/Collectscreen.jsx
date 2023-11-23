@@ -38,8 +38,10 @@ export const CollectScreen = ({ navigation, route }) => {
     const [comments, setcomments] = React.useState("");
     const [produit, setproduit] = React.useState("");
     const [price, setprice] = React.useState("");
+    const [price_m, setpricem] = React.useState("");
     const [unity, setunity] = React.useState("");
     const [currency, setcurrency] = React.useState("");
+    const user = global && global['user'];
 
     const [title, settitle] = React.useState("");
 
@@ -109,7 +111,6 @@ export const CollectScreen = ({ navigation, route }) => {
                 const { rows, count } = data;
                 setunities(rows)
             } else {
-
                 setisloading(false);
                 setisVisible(true);
                 settitle("Chargement");
@@ -169,19 +170,22 @@ export const CollectScreen = ({ navigation, route }) => {
 
                             switch (global.iscollecteur) {
                                 case 1:
-                                    onRunExternalRQSTE({
+                                    onRunExternalRQST({
                                         method: "POST",
-                                        url: `/produit/collecte/create`,
+                                        url: `/infos-marches/collecte`,
                                         data: {
-                                            "produit": produit,
-                                            "unite": unity,
-                                            "prix": price,
+                                            "id_collecteur": parseInt(user && user['realid']),
+                                            "id_produit": produit,
+                                            "id_unite": unity,
+                                            "prix_max": parseFloat(price),
+                                            "prix_min": parseFloat(price_m),
                                             "devise": currency,
                                             "commentaire": comments,
                                             "parms": Math.floor(Math.random() * (10 * 10 * 10))
                                         }
                                     }, (err, done) => {
                                         if (done) {
+                                            console.log(" =====> ", done, err);
                                             const s = done && done['status'];
                                             switch (s) {
                                                 case 200:
@@ -212,6 +216,17 @@ export const CollectScreen = ({ navigation, route }) => {
                                                     });
                                                     setisVisible(true);
                                                     setisloading(false);
+                                                    break;
+                                                case 405:
+                                                    setisloading(false);
+                                                    setisVisible(true);
+                                                    setoutput(done && done['data']);
+                                                    settitle("Erreur de traitement")
+                                                    Toast.show({
+                                                        type: 'error',
+                                                        text1: 'Erreur de traitement',
+                                                        text2: `${done && done['message']}`,
+                                                    })
                                                     break;
                                                 case 400:
                                                     setisloading(false);
@@ -488,10 +503,10 @@ export const CollectScreen = ({ navigation, route }) => {
                                             <View style={[inputGroup.container, {}]}>
                                                 <View style={[inputGroup.inputcontainer, { width: "100%" }]}>
                                                     <TextInput
-                                                        value={price}
+                                                        value={price_m}
                                                         maxLength={7}
                                                         keyboardType='numeric'
-                                                        onChangeText={e => setprice(e)}
+                                                        onChangeText={e => setpricem(e)}
                                                         placeholder='Prix' style={{ color: Colors.primaryColor, backgroundColor: Colors.pillColor, height: "100%", width: "100%", paddingLeft: 25, fontFamily: "mons", fontSize: Dims.iputtextsize }} />
                                                 </View>
                                             </View>
