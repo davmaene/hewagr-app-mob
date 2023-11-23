@@ -101,7 +101,7 @@ export const SigninAsCollectorScreen = ({ navigation, route }) => {
                                                                 if (dn) {
                                                                     global.user = insert;
                                                                     global.token = token;
-                                                                    global.iscollecteur = 0;
+                                                                    global.iscollecteur = 1;
                                                                     navigation.replace("tabs");
                                                                 } else {
                                                                     Toast.show({
@@ -167,7 +167,7 @@ export const SigninAsCollectorScreen = ({ navigation, route }) => {
                                             });
                                             break;
                                         default:
-                                            setoutput("Une erreur inconue vient de se produire !")
+                                            setoutput("Une erreur inconue vient de se produire !!!")
                                             Toast.show({
                                                 type: 'error',
                                                 text1: 'Erreur',

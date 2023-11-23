@@ -100,7 +100,6 @@ export const HomeScreen = ({ navigation }) => {
             method: "GET",
             url: `/infos-marches/collecte-user/${parseInt(user && user['realid'])}?status=0`
         }, (er, done) => {
-            console.log(done, er);
             if (done && done['status'] === 200) {
                 setisloading(false)
                 setcollections(done && done['data']);
@@ -112,19 +111,7 @@ export const HomeScreen = ({ navigation }) => {
     };
 
     const onLoadAbonnement = async () => {
-        // setisloading(true)
         setsousc([])
-        // await onRunExternalRQST({
-        //     method: "GET",
-        //     url: `/souscriptions/liste/${user && user['realid']}`
-        // }, (er, done) => {
-        //     if(done && done['status'] === 200){
-        //         setisloading(false)
-        //         setsousc(done && done['data']);
-        //     }else{
-        //         setisloading(false)
-        //     }
-        // })
     };
 
     // ================= loadng info according to ambassador =====
@@ -149,7 +136,6 @@ export const HomeScreen = ({ navigation }) => {
 
     // ================ loading information acconding to collector ====
     const ___ = async () => {
-        alert(1)
         onLoadCollections()
         onLoadAbonnement()
     };
