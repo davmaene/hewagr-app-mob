@@ -65,13 +65,13 @@ export const SigninAsCollectorScreen = ({ navigation, route }) => {
                         setisVisible(false)
                         try {
                             setisloading(true)
-                            onRunExternalRQSTE({
+                            onRunExternalRQST({
                                 method: "POST",
-                                url: "/login",
+                                url: "/collectors/collector/signin",
                                 data: {
                                     "username": num,
                                     "password": password,
-                                    "parms": Math.floor(Math.random() * 10 * 10 * 10)
+                                    "parms": Math.floor(Math.random() * 10 * 10 * 1000)
                                 }
                             }, (err, done) => {
                                 if(done){
@@ -79,12 +79,11 @@ export const SigninAsCollectorScreen = ({ navigation, route }) => {
                                     switch (done['status']) {
                                         case 200:
                                             const u = done && done['data'];
-
                                             onRunInsertQRY({
                                                 table: "__tbl_user",
                                                 columns: `'realid', 'nom', 'postnom', 'prenom', 'datenaissance', 'email', 'phone', 'adresse', 'genre', 'idvillage', 'crearedon', 'iscollector'`,
                                                 dot: "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?",
-                                                values: [`${u['id']}`, `${u['username']}`, `${u['fonction']}`, `${u['img']}`, `null`, `${u['email']}`, `${u['phone']}`, `null`, `null`, `null`,   `${new Date().toLocaleString()}`, 1]
+                                                values: [`${u['id']}`, `${u['nom']}`, `${u['postnom']}`, `${u['prenom']}`, `${u['datenaissance']}`, `${u['email']}`, `${u['phone']}`, `${u['adresse']}`, `${u['genre']}`, `${u['idvillage']}`, `${new Date().toLocaleString()}`, 0]
                                             }, (err, insert) => {
                                                 if(insert){
                                                     localStorageSAVE({
@@ -117,7 +116,7 @@ export const SigninAsCollectorScreen = ({ navigation, route }) => {
                                             })
 
                                             break;
-                                        case 201:
+                                        case 203:
                                             setoutput("Le mot de passe ou le nom d'utilisateur est incorect")
                                             Toast.show({
                                                 type: 'error',
@@ -213,7 +212,7 @@ export const SigninAsCollectorScreen = ({ navigation, route }) => {
                     <View style={{ borderTopEndRadius: Dims.bigradius, borderTopStartRadius: Dims.bigradius, backgroundColor: Colors.whiteColor, height: Dims.height, marginTop: Dims.smallradius }}>
                         <>
                             <View style={{ width: "85%", alignSelf: "center", height: 50, alignContent: "center", alignItems: 'center', marginTop: Dims.bigradius }}>
-                                <Text style={{ fontFamily: "mons", textAlign: "left", fontSize: Dims.titletextsize + 4, color: Colors.primaryColor }}>Compte collecteur</Text>
+                                <Text style={{ fontFamily: "mons", textAlign: "left", fontSize: Dims.titletextsize + 4, color: Colors.primaryColor }}>Compte collecteur.</Text>
                                 <TouchableHighlight
                                     underlayColor={"transparent"}
                                     onPress={() => {
