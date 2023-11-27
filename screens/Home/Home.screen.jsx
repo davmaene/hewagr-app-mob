@@ -100,11 +100,10 @@ export const HomeScreen = ({ navigation }) => {
             method: "GET",
             url: `/infos-marches/collecte-user/${parseInt(user && user['realid'])}?status=0`
         }, (er, done) => {
+            setisloading(false)
             if (done && done['status'] === 200) {
-                setisloading(false)
                 setcollections(done && done['data']);
             } else {
-                setisloading(false)
                 setcollections([])
             }
         })
