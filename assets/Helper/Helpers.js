@@ -95,8 +95,8 @@ export const randomString = ({ length }) => {
 };
 
 export const replaceString = ({ string, tag, replaceWith }) => {
-    string = string ? String(string) : "";
-    return typeof string === "string" ? string.replace(tag, replaceWith ) : string
+    // string = string ? String(string) : "";
+    return "Test"//typeof string === "string" ? string.replace(tag, replaceWith ) : string
 };
 
 export const returnSouscriptipnCategory = ({ category }) => {

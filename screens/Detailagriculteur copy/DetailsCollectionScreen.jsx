@@ -18,14 +18,17 @@ export const DetailsCollectionScreen = ({ navigation, route }) => {
     const [isloading, setisloading] = React.useState(false)
     const [extras, setextras] = React.useState({})
 
+    const { __tbl_culture, __tbl_unite_mesure, __tbl_user, commentaire, devise, id, prix_max, prix_min } = item;
+
     const onRefresh = () => {
         setisloading(true)
         onRunExternalRQST({
-            url: `/infos-marches/marches/user/${user && user['id']}`,
+            url: `/infos-marches/marches/user/${user && user['realid']}`,
             method: "GET"
         }, (err, done) => {
             setisloading(false)
             if (done) {
+                // console.log(done);
                 setextras(done && done['data'])
             } else {
                 setextras({})
@@ -65,15 +68,11 @@ export const DetailsCollectionScreen = ({ navigation, route }) => {
                             </View>
                             <View style={{ width: "25%", alignContent: "center", alignItems: "center", padding: 2, paddingVertical: 10, }}>
                                 <Text style={{ fontFamily: "mons-e", textAlign: "center" }}>Marché</Text>
-                                <Text style={{ fontFamily: "mons-b", textAlign: "center", fontSize: Dims.subtitletextsize, color: Colors.primaryColor }}>{item && item['marche']}</Text>
+                                <Text style={{ fontFamily: "mons-b", textAlign: "center", fontSize: Dims.subtitletextsize, color: Colors.primaryColor }}>{extras && extras['__tbl_march'] ? extras['__tbl_march']['name'] : "---"}</Text>
                             </View>
-                            <View style={{ width: "25%", alignContent: "center", alignItems: "center", padding: 2, paddingVertical: 10 }}>
-                                <Text style={{ fontFamily: "mons-e", textAlign: "center" }}>Zône</Text>
-                                <Text style={{ fontFamily: "mons-b", textAlign: "center", fontSize: Dims.subtitletextsize, color: Colors.primaryColor }}>{item && item['zone']}</Text>
-                            </View>
-                            <View style={{ width: "25%", alignContent: "center", alignItems: "center", backgroundColor: Colors.pillColor, padding: 2, paddingVertical: 10, borderRightColor: Colors.primaryColor, borderRightWidth: 4 }}>
+                            <View style={{ width: "50%", alignContent: "center", alignItems: "center", backgroundColor: Colors.pillColor, padding: 2, paddingVertical: 10, borderRightColor: Colors.primaryColor, borderRightWidth: 4 }}>
                                 <Text style={{ fontFamily: "mons-e", textAlign: "center" }}>Produit</Text>
-                                <Text style={{ fontFamily: "mons-b", textTransform: "uppercase", textAlign: "center", fontSize: Dims.subtitletextsize, color: Colors.primaryColor }}>{item && item['produit']}</Text>
+                                <Text style={{ fontFamily: "mons-b", textTransform: "uppercase", textAlign: "center", fontSize: Dims.subtitletextsize, color: Colors.primaryColor }}>{__tbl_culture && __tbl_culture['cultures']}</Text>
                             </View>
                         </View>
                         <View style={{ marginVertical: 5 }}>
@@ -81,39 +80,43 @@ export const DetailsCollectionScreen = ({ navigation, route }) => {
                         </View>
                         <View style={{ padding: 2, marginBottom: 20 }}>
                             <Text style={{ fontFamily: "mons-e", paddingBottom: 5 }}>Date de collecte</Text>
-                            <Text style={{ fontFamily: "mons-b", color: Colors.darkColor }}>{item && item['createAt'] ? item['createAt'] : "---"}</Text>
+                            <Text style={{ fontFamily: "mons-b", color: Colors.darkColor }}>{item && item['created_at'] ? item['created_at'] : "---"}</Text>
                         </View>
                         <View style={{ padding: 2, marginBottom: 20 }}>
                             <Text style={{ fontFamily: "mons-e", paddingBottom: 5 }}>Commentaire</Text>
-                            <Text style={{ fontFamily: "mons-b", color: Colors.darkColor }}>{item && item['description'] ? item['description'] : "---"}</Text>
+                            <Text style={{ fontFamily: "mons-b", color: Colors.darkColor }}>{item && item['commentaire'] ? item['commentaire'] : "---"}</Text>
                         </View>
                         <View style={{ marginVertical: 5 }}>
                             <Divider style={{ backgroundColor: color }} />
                         </View>
                         <View style={{ padding: 2 }}>
                             <Text style={{ fontFamily: "mons-e", paddingBottom: 5 }}>Produit</Text>
-                            <Text style={{ fontFamily: "mons-b", color: Colors.primaryColor }}>{item && item['produit'] ? item['produit'] : "---"}</Text>
+                            <Text style={{ fontFamily: "mons-b", color: Colors.primaryColor }}>{__tbl_culture && __tbl_culture['cultures'] ? __tbl_culture['cultures'] : "---"}</Text>
                         </View>
                         <View style={{ marginVertical: 5 }}>
                             <Divider style={{ backgroundColor: color }} />
                         </View>
                         <View style={{ padding: 2 }}>
                             <Text style={{ fontFamily: "mons-e", paddingBottom: 5 }}>Unité locale</Text>
-                            <Text style={{ fontFamily: "mons-b", color: Colors.primaryColor }}>{item && item['unites'] ? item['unites'] : "---"}</Text>
+                            <Text style={{ fontFamily: "mons-b", color: Colors.primaryColor }}>{__tbl_unite_mesure && __tbl_unite_mesure['name'] ? __tbl_unite_mesure['name'] : "---"}</Text>
                         </View>
                         <View style={{ marginVertical: 5 }}>
                             <Divider style={{ backgroundColor: color }} />
                         </View>
                         <View style={{ padding: 2 }}>
                             <Text style={{ fontFamily: "mons-e", paddingBottom: 5 }}>Valeur en kilogramme <Text style={{ fontFamily: "mons" }}>kg</Text></Text>
-                            <Text style={{ fontFamily: "mons-b", color: Colors.primaryColor }}>{item && item['valeur_kg'] ? item['valeur_kg'] : "---"}</Text>
+                            <Text style={{ fontFamily: "mons-b", color: Colors.primaryColor }}>{__tbl_unite_mesure && __tbl_unite_mesure['valeur_kg'] ? `${__tbl_unite_mesure['valeur_kg']}KG` : "---"}</Text>
                         </View>
                         <View style={{ marginVertical: 5 }}>
                             <Divider style={{ backgroundColor: color }} />
                         </View>
                         <View style={{ padding: 2 }}>
-                            <Text style={{ fontFamily: "mons-e", paddingBottom: 5 }}>Prix</Text>
-                            <Text style={{ fontFamily: "mons-b", color: Colors.secondaryColor }}>{item && item['prix'] ? item['prix'] : "---"}<Text>{item && item['devise'] ? item['devise'] : "---"}</Text></Text>
+                            <Text style={{ fontFamily: "mons-e", paddingBottom: 5 }}>Prix en détail</Text>
+                            <Text style={{ fontFamily: "mons-b", color: Colors.secondaryColor }}>{prix_min && prix_min ? prix_min : "---"}<Text>{devise && devise ? devise : "---"}</Text></Text>
+                        </View>
+                        <View style={{ padding: 2 }}>
+                            <Text style={{ fontFamily: "mons-e", paddingBottom: 5 }}>Prix en gros</Text>
+                            <Text style={{ fontFamily: "mons-b", color: Colors.secondaryColor }}>{prix_max && prix_max ? prix_max : "---"}<Text>{devise && devise ? devise : "---"}</Text></Text>
                         </View>
                         <View style={{ marginVertical: 5 }}>
                             <Divider style={{ backgroundColor: color }} />
@@ -127,14 +130,14 @@ export const DetailsCollectionScreen = ({ navigation, route }) => {
                         </View>
                         <View style={{ padding: 2 }}>
                             <Text style={{ fontFamily: "mons-e", paddingBottom: 5 }}>Marché</Text>
-                            <Text style={{ fontFamily: "mons-b", color: Colors.primaryColor }}>{item && item['marche'] ? item['marche'] : "---"}</Text>
+                            <Text style={{ fontFamily: "mons-b", color: Colors.primaryColor }}>{extras && extras['__tbl_march'] ? extras['__tbl_march']['name'] : "---"}</Text>
                         </View>
                         <View style={{ marginVertical: 5 }}>
                             <Divider style={{ backgroundColor: color }} />
                         </View>
                         <View style={{ padding: 10, backgroundColor: Colors.primaryColor, borderRadius: 5 }}>
                             <Text style={{ fontFamily: "mons-e", paddingBottom: 5, color: Colors.whiteColor }}>Jour du marché</Text>
-                            <Text style={{ fontFamily: "mons-b", color: Colors.whiteColor }}>{item && item['jour_marche'] ? replaceString({ string: item['jour_marche'], replaceWith: "   |  ", tag: /,/g }) : "---"}</Text>
+                            <Text style={{ fontFamily: "mons-b", color: Colors.whiteColor }}>{extras && extras['__tbl_march'] && extras['__tbl_march']['jours_marches'] ? replaceString({ string: extras['__tbl_march']['jours_marches'], replaceWith: "   |  ", tag: /,/g }) : "---"}</Text>
                         </View>
                     </View>
                 </View>
