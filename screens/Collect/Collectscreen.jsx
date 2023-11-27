@@ -21,6 +21,8 @@ import DialogBox from 'react-native-dialogbox';
 export const CollectScreen = ({ navigation, route }) => {
     const [isloading, setisloading] = React.useState(false);
     const [unities, setunities] = React.useState([]);
+    const [markets, setmarkets] = React.useState([]);
+    const [market, setmarket] = React.useState("");
     const [products, setproducts] = React.useState([]);
     const [currencies, setcurencies] = React.useState([
         {
@@ -124,6 +126,30 @@ export const CollectScreen = ({ navigation, route }) => {
         })
     }
 
+    const onLoadMarkests = async () => {
+        onRunExternalRQST({
+            method: "GET",
+            url: '/infos-marches/marches?page=1&limit=1000'
+        }, (err, done) => {
+            setisloading(false);
+            if (done && done['status'] === 200) {
+                const { data } = done;
+                const { rows, count } = data;
+                setmarkets(rows)
+            } else {
+                setmarkets([])
+                setisloading(false);
+                setisVisible(true);
+                settitle("Chargement");
+                Toast.show({
+                    type: 'error',
+                    text1: 'Erreur de chargement des informations',
+                    text2: `Les informations n'ont pas été chargé correctement `,
+                });
+            }
+        })
+    }
+
     const onLoadGlobalinfos = async () => {
         setisVisible(false);
         setoutput("");
@@ -134,6 +160,7 @@ export const CollectScreen = ({ navigation, route }) => {
                 setisloading(true);
                 onLoadProducts()
                 onLoadUniteMesure()
+                onLoadMarkests()
             } else {
                 setisVisible(true);
                 settitle("")
@@ -174,6 +201,7 @@ export const CollectScreen = ({ navigation, route }) => {
                                         method: "POST",
                                         url: `/infos-marches/collecte`,
                                         data: {
+                                            "TblMarchId": parseInt(market),
                                             "id_collecteur": parseInt(user && user['realid']),
                                             "id_produit": produit,
                                             "id_unite": unity,
@@ -420,6 +448,35 @@ export const CollectScreen = ({ navigation, route }) => {
                         <Divider />
                     </View>
                     <View style={{ width: "90%", alignSelf: "center" }}>
+                        {/* ======================================= */}
+                        <View style={{ width: "100%", height: 65, flexDirection: "column", marginTop: 15 }}>
+                            <Text style={{ fontFamily: "mons-b", paddingLeft: 10, color: Colors.primaryColor }}>Marché <Text style={{ color: Colors.dangerColor }}>*</Text></Text>
+                            <View style={inputGroup.container}>
+                                <View style={inputGroup.inputcontainer}>
+                                    <Dropdown
+                                        style={[{ width: "100%", paddingRight: 15, marginTop: 0, height: "100%", backgroundColor: Colors.pillColor }]}
+                                        placeholderStyle={{ color: Colors.placeHolderColor, fontFamily: "mons", fontSize: Dims.iputtextsize, paddingLeft: 25 }}
+                                        containerStyle={{}}
+                                        selectedTextStyle={{ color: Colors.primaryColor, fontFamily: "mons", paddingLeft: 25, fontSize: Dims.iputtextsize }}
+                                        inputSearchStyle={{ backgroundColor: Colors.pillColor, height: 45, width: "95%", paddingLeft: 5, fontFamily: "mons", fontSize: Dims.iputtextsize }}
+                                        data={markets}
+                                        search
+                                        value={market}
+                                        maxHeight={200}
+                                        labelField="name"
+                                        valueField="id"
+                                        placeholder={'Séléctionner un marché'}
+                                        searchPlaceholder="Recherche ..."
+                                        onChange={item => {
+                                            setproduit(item.id)
+                                        }}
+                                    />
+                                </View>
+                                <View style={[inputGroup.iconcontainer, {}]}>
+                                    <Ionicons name="bookmark" size={Dims.iconsize - 4} color={Colors.primaryColor} />
+                                </View>
+                            </View>
+                        </View>
                         {/* ======================================= */}
                         <View style={{ width: "100%", height: 65, flexDirection: "column", marginTop: 15 }}>
                             <Text style={{ fontFamily: "mons-b", paddingLeft: 10, color: Colors.primaryColor }}>Produit <Text style={{ color: Colors.dangerColor }}>*</Text></Text>
