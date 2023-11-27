@@ -8,17 +8,33 @@ import { Feather, FontAwesome5, Entypo, Ionicons, MaterialCommunityIcons, AntDes
 import { Dims } from '../../assets/dimensions/Dimemensions';
 import { ScrollView } from 'react-native';
 import { replaceString } from '../../assets/Helper/Helpers';
+import { onRunExternalRQST } from '../../services/communications';
 
 export const DetailsCollectionScreen = ({ navigation, route }) => {
 
     const item = route && route['params'] && route['params']['item'];
     const color = Colors.primaryColor;// 
+    const user = global && global['user'];
+    const [isloading, setisloading] = React.useState(false)
+    const [extras, setextras] = React.useState({})
 
     const onRefresh = () => {
-
+        setisloading(true)
+        onRunExternalRQST({
+            url: `/infos-marches/marches/user/${user && user['id']}`,
+            method: "GET"
+        }, (err, done) => {
+            setisloading(false)
+            if (done) {
+                setextras(done && done['data'])
+            } else {
+                setextras({})
+            }
+        })
     };
 
     React.useEffect(() => {
+        onRefresh()
     }, [])
 
     return (
