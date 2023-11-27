@@ -1,13 +1,13 @@
 import moment from 'moment';
 
 export const returnInitialOfNames = ({ fsname, lsname }) => {
-    if(fsname && fsname.length > 0 && lsname && lsname.length > 0){
+    if (fsname && fsname.length > 0 && lsname && lsname.length > 0) {
 
         fsname = fsname.toString().trim();
         lsname = lsname.toString().trim();
-        return `${fsname.substring(0,1)}${lsname.substring(0,1)}`;
+        return `${fsname.substring(0, 1)}${lsname.substring(0, 1)}`;
 
-    }else{
+    } else {
         return "--"
     }
 };
@@ -17,7 +17,7 @@ export const keys = {
     "token": "token"
 };
 
-export const sessionExpires = (( 1000 * 3600 ) * 3); //means for 3 hours
+export const sessionExpires = ((1000 * 3600) * 3); //means for 3 hours
 
 export const datePlusSomeDays = ({ days }) => {
     switch (parseInt(days)) {
@@ -30,7 +30,7 @@ export const datePlusSomeDays = ({ days }) => {
         case 3:
             days = 90;
             break;
-        case 4: 
+        case 4:
             days = 365;
             break;
         default:
@@ -47,7 +47,7 @@ export const calcMinimumDate = ({ agerequired }) => {
 };
 
 export const emailValidator = ({ email }) => {
-    if((/^[a-z0-9._-]+@[a-z0-9._-]+\.[a-z]{2,6}$/).test(email.toString().toLowerCase())) return true;
+    if ((/^[a-z0-9._-]+@[a-z0-9._-]+\.[a-z]{2,6}$/).test(email.toString().toLowerCase())) return true;
     else return false;
 };
 
@@ -95,8 +95,12 @@ export const randomString = ({ length }) => {
 };
 
 export const replaceString = ({ string, tag, replaceWith }) => {
-    // string = string ? String(string) : "";
-    return "Test"//typeof string === "string" ? string.replace(tag, replaceWith ) : string
+    try {
+        const arr = JSON.parse(string)
+        return arr.join(" | ")
+    } catch (error) {
+        return "---"
+    }
 };
 
 export const returnSouscriptipnCategory = ({ category }) => {
