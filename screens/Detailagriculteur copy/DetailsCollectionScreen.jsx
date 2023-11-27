@@ -62,10 +62,10 @@ export const DetailsCollectionScreen = ({ navigation, route }) => {
                             <FontAwesome name="bookmark" size={Dims.iconsize * 2} color={Colors.primaryColor} />
                         </View>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: Dims.iconsize }}>
-                            <View style={{ width: "25%", alignContent: "flex-start", alignItems: "flex-start", padding: 2, paddingVertical: 10, }}>
+                            {/* <View style={{ width: "25%", alignContent: "flex-start", alignItems: "flex-start", padding: 2, paddingVertical: 10, }}>
                                 <Text style={{ fontFamily: "mons-e", textAlign: "left" }}>Catégorie</Text>
                                 <Text style={{ fontFamily: "mons-b", textAlign: "left", fontSize: Dims.subtitletextsize, color: Colors.primaryColor }}>{item && item['categorie']}</Text>
-                            </View>
+                            </View> */}
                             <View style={{ width: "25%", alignContent: "center", alignItems: "center", padding: 2, paddingVertical: 10, }}>
                                 <Text style={{ fontFamily: "mons-e", textAlign: "center" }}>Marché</Text>
                                 <Text style={{ fontFamily: "mons-b", textAlign: "center", fontSize: Dims.subtitletextsize, color: Colors.primaryColor }}>{extras && extras['__tbl_march'] ? extras['__tbl_march']['name'] : "---"}</Text>
