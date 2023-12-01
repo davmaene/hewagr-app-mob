@@ -9,7 +9,9 @@ OnInitialize(); // initialize tables and create them if not exist
 
 axios.interceptors.request.use(async config => {
     const controller = new AbortController();
+    const { realid, email, phone } = global && global['user']
     config.headers['x-connexion-hewagri-origin-mob'] = true;
+    config.headers['x-connexion-hewagri-infos-user'] = parseInt(realid)
     const { code, data, message } = await syncLocalStorageLOAD({ key: keys['token'] });
     if (code === 200) {
         config.headers.apikey = "$2b$10$AS6GbX37SkQS6skhMOYjveDOuUUgvGz9dvsrCbeylWl/SwMkDDp2G";

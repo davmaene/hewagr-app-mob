@@ -9,7 +9,6 @@ import { Title } from '../../components/Title/Title';
 import { onRunExternalRQST, onRunExternalRQSTE } from '../../services/communications';
 import { AntDesign, Entypo, Feather, FontAwesome, MaterialIcons, FontAwesome5, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import Modal from 'react-native-modal';
-import Spinner from 'react-native-loading-spinner-overlay';
 import { toastConfig } from '../../assets/Toast/Toastconfig';
 import NetInfos from '@react-native-community/netinfo';
 import Toast from 'react-native-toast-message';
@@ -468,7 +467,7 @@ export const CollectScreen = ({ navigation, route }) => {
                                         placeholder={'Séléctionner un marché'}
                                         searchPlaceholder="Recherche ..."
                                         onChange={item => {
-                                            setproduit(item.id)
+                                            setmarket(item.id)
                                         }}
                                     />
                                 </View>

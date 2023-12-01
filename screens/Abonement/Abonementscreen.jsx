@@ -17,8 +17,8 @@ import MultiSelect from 'react-native-multiple-select';
 import { Loader } from '../../components/Loader/comp.loader';
 import { appname } from '../../assets/configs/configs';
 import DialogBox from 'react-native-dialogbox';
-import { remove_0_ToPhone_Number } from '../../assets/Helper/Helpers';
-// import { PageScrollView } from 'pagescrollview';
+import { datePlusSomeDays, fillphone, remove_0_ToPhone_Number } from '../../assets/Helper/Helpers';
+import moment from 'moment';
 
 export const AbonnemetScreen = ({ navigation, route }) => {
 
@@ -41,20 +41,22 @@ export const AbonnemetScreen = ({ navigation, route }) => {
     const [output, setoutput] = React.useState("");
     const [phone, setphone] = React.useState("");
     const [selectedItems, setselectedItems] = React.useState([]);
+    const [agris, setagris] = React.useState([]);
     const [selectedItemsMarkets, setselectedItemsMarkets] = React.useState([]);
 
-    const [market, setmarket] = React.useState("");
     const [packet, setpack] = React.useState("");
+    const [ag, setag] = React.useState("");
     const [lg, setlg] = React.useState("");
     const [title, settitle] = React.useState("");
-    const [h, seth] = React.useState(0)
+    const [dev, setdev] = React.useState("");
+    const [pp, setpp] = React.useState(false)
     const user = global.user;
 
     const ref = React.useRef();
     const refc = React.useRef();
 
     const BottomSheetDialog = ({ navigation, visible, title: { text, color }, subTitle: { sText, sColor } }) => {
-        return(
+        return (
             <Modal
                 isVisible={visible}
                 animationIn={"slideInUp"}
@@ -66,12 +68,12 @@ export const AbonnemetScreen = ({ navigation, route }) => {
                 <SafeAreaView style={[buttons, { paddingVertical: 15, height: "auto" }]}>
                     <View style={{ width: "90%", flexDirection: "column", justifyContent: "space-between", alignSelf: "center", minHeight: 110 }}>
                         <View style={{ alignContent: "center", alignItems: "center", alignSelf: "center", marginTop: 20, marginBottom: 10 }}>
-                            { title.length > 0 ? <AntDesign name='warning' color={Colors.dangerColor} size={50}  /> : <MaterialIcons name='wifi-off' color={Colors.dangerColor} size={50} />}
+                            {title.length > 0 ? <AntDesign name='warning' color={Colors.dangerColor} size={50} /> : <MaterialIcons name='wifi-off' color={Colors.dangerColor} size={50} />}
                         </View>
                         <>
                             <View style={{ height: "auto", marginBottom: 50 }}>
-                                <Text style={{ fontFamily: "mons-b", fontSize: Dims.titletextsize, paddingTop: 5, textAlign: "center", color: color ? color : Colors.darkColor }}>{ text }</Text>
-                                <Text style={{ fontFamily: "mons-e", fontSize: Dims.subtitletextsize, textAlign: "center", color: sColor ? sColor : Colors.darkColor, paddingTop: 10 }}>{ sText }</Text>
+                                <Text style={{ fontFamily: "mons-b", fontSize: Dims.titletextsize, paddingTop: 5, textAlign: "center", color: color ? color : Colors.darkColor }}>{text}</Text>
+                                <Text style={{ fontFamily: "mons-e", fontSize: Dims.subtitletextsize, textAlign: "center", color: sColor ? sColor : Colors.darkColor, paddingTop: 10 }}>{sText}</Text>
                             </View>
                         </>
                     </View>
@@ -87,38 +89,74 @@ export const AbonnemetScreen = ({ navigation, route }) => {
 
     const onSelectedItemsChangeMarket = selectedItemsMarket => {
         setselectedItemsMarkets(selectedItemsMarket)
-    }
+    };
 
     const onLoadGlobalinfos = async () => {
         setisVisible(false);
         setoutput("");
         settitle("");
         NetInfos.fetch().then(on => {
-            if(on.isConnected){
+            if (on.isConnected) {
                 setisloading(true);
+
                 onRunExternalRQST({
-                    method: "GET",
-                    url: '/collectors/load/infos/abonnement'
+                    url: "/cultures/liste",
+                    method: "GET"
                 }, (err, done) => {
-                    if(done && done['status'] === 200){
-                        const d = done['data'];
-                        setmarkets(d && d['marches'])
-                        setproducts(d && d['produits'])
-                        setpackets(d && d['packets'])
-                        setisloading(false);
-                    }else{
-                        setisloading(false);
-                        setisVisible(true);
-                        settitle("Chargement");
-                        setoutput("Les informations relative sur le marché, les produits agricoles et les pacquets n'ont pas été chargé correctement nous vous conseillons alors de réessayer le chargement de ces dernières !")
-                        Toast.show({
-                            type: 'error',
-                            text1: 'Erreur de chargement des informations',
-                            text2: `Les informations n'ont pas été chargé correctement `,
-                        });
+                    setisloading(false)
+                    if (done) {
+                        const { status, message, data } = done
+                        setproducts(status === 200 ? data['liste'] : [])
+                    } else {
+                        setproducts([])
                     }
                 })
-            }else{
+
+                onRunExternalRQST({
+                    url: "/types/liste",
+                    method: "GET"
+                }, (err, done) => {
+                    setisloading(false)
+                    if (done) {
+                        const { status, message, data } = done
+                        setpackets(status === 200 ? data['liste'] : [])
+                    } else {
+                        setpackets([])
+                    }
+                })
+
+                onRunExternalRQST({
+                    url: "/infos-marches/marches?page=1&limit=1000",
+                    method: "GET"
+                }, (err, done) => {
+                    setisloading(false)
+                    if (done) {
+                        const { status, message, data } = done
+                        setmarkets(status === 200 ? data['rows'] : [])
+                    } else {
+                        setmarkets([])
+                    }
+                })
+
+                onRunExternalRQST({
+                    url: "/agriculteurs/liste",
+                    method: "GET"
+                }, (err, done) => {
+                    setisloading(false)
+                    if (done) {
+                        const { status, message, data } = done
+                        setagris(status === 200 ? data['liste'].map(v => {
+                            return {
+                                ...v,
+                                fln: `${v && v['nom']} ${v && v['postnom']} | ${v && v['phone']}`
+                            }
+                        }) : [])
+                    } else {
+                        setagris([])
+                    }
+                })
+
+            } else {
                 setisVisible(true);
                 settitle("")
                 setisloading(false)
@@ -141,32 +179,40 @@ export const AbonnemetScreen = ({ navigation, route }) => {
 
     const handlePayement = async ({ payementMethode }) => {
         NetInfos.fetch().then(on => {
-            if(on.isConnected){
+            if (on.isConnected) {
                 setisloading(true);
                 setoutput("");
                 setisVisibleA(false);
                 onRunExternalRQST({
                     method: "POST",
-                    url: `/collectors/collector/newsouscription`,
+                    url: `/souscriptions/souscription/add`,
                     data: {
-                        "phone": `+243${remove_0_ToPhone_Number({ phone: phone })}`,
-                        "market": [
+                        "phone_payement": pp ? fillphone({ phone: phone }) : undefined,
+                        "markets": [
                             ...selectedItemsMarkets
                         ],
-                        "language": lg,
-                        "selectedproducts": [
+                        "idlangue": lg,
+                        "id_produit": [
                             ...selectedItems
                         ],
-                        "packet": packet,
+                        "currency": dev,
+                        "type": parseInt(packet),
+                        "frequence": 2,
+                        "datedebut": moment().format('l'),
+                        "datefin": datePlusSomeDays({ days: parseInt(packet) }),
                         "parms": Math.floor(Math.random() * 10 * 10 * 10),
-                        "paiementmethode": payementMethode,
-                        "typesouscritpion": 1,
+                        "method": payementMethode,
+                        "category": 2,
+                        "idchamps": 1,
+                        "idagriculteur": parseInt(ag),
                         "idambassadeur": user && user['realid']
                     }
                 }, (err, done) => {
-                    if(done){
-                        const s = done && done['status'];
-                        switch (s) {
+                    if (done) {
+                        const { status, message, data } = done;
+                        console.log(done);
+                        setisloading(false)
+                        switch (status) {
                             case 200:
                                 setisloading(false);
                                 refc.current.tip({
@@ -180,7 +226,8 @@ export const AbonnemetScreen = ({ navigation, route }) => {
                                             fontSize: Dims.subtitletextsize
                                         },
                                         callback: () => {
-                                            onRefresh()
+                                            // onRefresh()
+                                            navigation.goBack()
                                         }
                                     }
                                 })
@@ -198,13 +245,27 @@ export const AbonnemetScreen = ({ navigation, route }) => {
                                 break;
                             case 201:
                                 setisloading(false);
-                                setisVisible(true);
-                                setoutput(done && done['data']['message']);
-                                settitle("Erreur de traitement");
+                                refc.current.tip({
+                                    title: <Text style={{ fontFamily: "mons", fontSize: Dims.titletextsize }}>Paiement envoyé</Text>,
+                                    content: [<Text style={{ fontFamily: "mons-e", fontSize: Dims.subtitletextsize, marginHorizontal: 25 }} >Le paiement est encours, un message de confirmation vous sera envoyer une fois que le paiement sera effectif !</Text>],
+                                    btn: {
+                                        text: 'OK, j\'ai compris',
+                                        style: {
+                                            color: Colors.primaryColor,
+                                            fontFamily: 'mons',
+                                            fontSize: Dims.subtitletextsize
+                                        },
+                                        callback: () => {
+                                            navigation.goBack()
+                                        }
+                                    }
+                                })
+                                setoutput('Le paiement est encours, un message de confirmation vous sera envoyer une fois que le paiement sera effectif !');
+                                settitle("Paiement envoyé");
                                 Toast.show({
-                                    type: 'error',
-                                    text1: 'Erreur de traitement',
-                                    text2: `${done && done['data']['message']}`,
+                                    type: 'success',
+                                    text1: 'Paiement envoyé',
+                                    text2: `Le paiement est encours, un message de confirmation vous sera envoyer une fois que le paiement sera effectif !`,
                                 })
                                 break;
                             default:
@@ -218,7 +279,7 @@ export const AbonnemetScreen = ({ navigation, route }) => {
                                 })
                                 break;
                         }
-                    }else{
+                    } else {
                         setisVisible(true);
                         setisloading(false);
                         setoutput(" Nous avons rencotrer une erreur lors du traitement de vos informations ! ");
@@ -229,7 +290,7 @@ export const AbonnemetScreen = ({ navigation, route }) => {
                         })
                     }
                 })
-            }else{
+            } else {
                 Toast.show({
                     type: 'error',
                     text1: 'Connexion internet!',
@@ -240,45 +301,59 @@ export const AbonnemetScreen = ({ navigation, route }) => {
     };
 
     const handlConfirm = async () => {
-        if(phone.length >= 9){
-            if(selectedItemsMarkets.length > 0){
-                if(packet.length > 0){
-                    if(lg.toString().length > 0){
-                        if(selectedItems.length > 0){
-                            setisVisibleA(true);
-                        }else{
-                            Toast.show({
-                                type: 'error',
-                                text1: 'Champs obligatoire',
-                                text2: `Séléctionner les produites agricoles`,
-                            })
-                        }
-                    }else{
-                        Toast.show({
-                            type: 'error',
-                            text1: 'Champs obligatoire',
-                            text2: `Séléctionner une langue`,
-                        })
-                    }
-                }else{
-                    Toast.show({
-                        type: 'error',
-                        text1: 'Champs obligatoire',
-                        text2: `Séléctionner un paquet`,
-                    })
-                }
-            }else{
+        if (pp) {
+            if (phone.toString().length >= 9);
+            else {
                 Toast.show({
                     type: 'error',
                     text1: 'Champs obligatoire',
-                    text2: `Séléctionner au moins un marché`,
+                    text2: `Entrer le numéro de téléphone `,
                 });
+                return false
             }
-        }else{
+
+            if (dev.toString().length > 0);
+            else {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Champs obligatoire',
+                    text2: `Séléctionner la dévise !`,
+                });
+                return false
+            }
+        }
+
+        if (selectedItemsMarkets.length >= 0) {
+            if (packet.toString().length > 0) {
+                if (1) { // lg.toString().length > 0
+                    if (selectedItems.length > 0) { // produits agricoles
+                        setisVisibleA(true);
+                    } else {
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Champs obligatoire',
+                            text2: `Séléctionner les produites agricoles`,
+                        })
+                    }
+                } else {
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Champs obligatoire',
+                        text2: `Séléctionner une langue`,
+                    })
+                }
+            } else {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Champs obligatoire',
+                    text2: `Séléctionner un paquet`,
+                })
+            }
+        } else {
             Toast.show({
                 type: 'error',
                 text1: 'Champs obligatoire',
-                text2: `Entrer le numéro de téléphone `,
+                text2: `Séléctionner au moins un marché`,
             });
         }
     };
@@ -288,40 +363,39 @@ export const AbonnemetScreen = ({ navigation, route }) => {
         // setScrollLayoutHeight(height)
         // seth(height)
         // console.log("New Heigt =>>>>>>>> ", height);
-      }
+    }
 
     React.useEffect(() => {
         onLoadGlobalinfos()
     }, [])
 
-    return(
+    return (
         <>
-            <Title 
+            <Title
                 navigation={navigation}
-                title={"Abonnement prix du marché"} 
-                subtitle={"Formulaire d'abonnement"} 
+                title={"Abonnement aux prix du marché"}
+                subtitle={"Formulaire d'abonnement"}
             />
-            <View 
+            <View
                 style={{ backgroundColor: Colors.whiteColor, paddingTop: Dims.borderradius, flexShrink: 1 }}
                 onLayout={handleScrollContentLayout}
             >
-                <ScrollView 
+                <ScrollView
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={true}
-                    // style={{ flex: 1 }}
                     contentOffset={{ x: 0, y: 0 }}
-                    contentContainerStyle={{ 
+                    contentContainerStyle={{
                         paddingBottom: "110%"
                     }}
                     refreshControl={
                         <RefreshControl
-                            colors={[ Colors.primaryColor ]}
+                            colors={[Colors.primaryColor]}
                             refreshing={isloading}
                             onRefresh={onRefresh}
                         />
                     }
                 >
-                    <View style={{width: "90%", alignSelf: "center", paddingVertical: 10}}>
+                    <View style={{ width: "90%", alignSelf: "center", paddingVertical: 10 }}>
                         <Text style={{ paddingBottom: 6, marginTop: 0, fontFamily: "mons", fontSize: Dims.titletextsize }}>Abonenment | <Text style={{ color: Colors.primaryColor }}>prix du marché</Text></Text>
                         <Text style={{ fontFamily: "mons-e", fontSize: Dims.subtitletextsize }}>Formulaire d'un nouvel abonenment | remplissez les champs pour pouvoir l'ajouter dans le système </Text>
                     </View>
@@ -329,53 +403,160 @@ export const AbonnemetScreen = ({ navigation, route }) => {
                         <Divider />
                     </View>
                     <View style={{ width: "90%", alignSelf: "center" }}>
-                        <View style={{width: "100%", height: 65, flexDirection: "column", marginTop: 15}}>
-                            <Text style={{ fontFamily: "mons-b", paddingLeft: 10, color: Colors.primaryColor }}>Numéro de téléphone <Text style={{color: Colors.dangerColor}}>*</Text></Text>
-                            <View style={ inputGroup.container }>
-                                <View style={[inputGroup.inputcontainer, { flexDirection: "row-reverse" }]}>
-                                    <TextInput 
-                                        keyboardType='phone-pad'
-                                        onChangeText={t => setphone(t)}
-                                        value={phone}
-                                        autoComplete="off"
-                                        maxLength={10}
-                                        placeholder='Numéro de téléphone' 
-                                        style={{ backgroundColor: Colors.pillColor, height: "100%", width: "80%", paddingLeft: 25, fontFamily: "mons", fontSize: Dims.iputtextsize, color: Colors.primaryColor }} 
-                                    />
-                                    <View style={{ width: "20%", alignContent: "center", alignItems: "flex-end", backgroundColor: Colors.pillColor, height: "100%", justifyContent: "center" }}>
-                                        <Text style={{ fontFamily: "mons", textAlign: "right", color: Colors.primaryColor }}>+243</Text>
+                        <View style={{ flexDirection: "row", width: "100%", justifyContent: "space-between" }}>
+                            <View style={{ width: "48%", height: 65, flexDirection: "column", marginTop: 25 }}>
+                                <TouchableHighlight
+                                    onPress={() => {
+                                        setpp(true)
+                                    }}
+                                    underlayColor={Colors.primaryColor}
+                                    style={[btn, { backgroundColor: pp ? Colors.primaryColor : Colors.pillColor }]}
+                                >
+                                    <Text style={{ color: pp ? Colors.pillColor : Colors.primaryColor, fontFamily: "mons-b", fontSize: 12 }}>Autre numéro</Text>
+                                </TouchableHighlight>
+                            </View>
+                            <View style={{ width: "48%", height: 65, flexDirection: "column", marginTop: 25 }}>
+                                <TouchableHighlight
+                                    onPress={() => {
+                                        setpp(false)
+                                    }}
+                                    underlayColor={Colors.primaryColor}
+                                    style={[btn, { backgroundColor: pp ? Colors.pillColor : Colors.primaryColor }]}
+                                >
+                                    <Text style={{ color: pp ? Colors.primaryColor : Colors.pillColor, fontFamily: "mons-b", fontSize: 12 }}>Numéro de l'agriculteur</Text>
+                                </TouchableHighlight>
+                            </View>
+                        </View>
+                        {/* ================= */}
+                        {pp && (
+                            <View style={{ flexDirection: "row", width: "100%", justifyContent: "space-between", marginBottom: 15 }}>
+                                <View style={{ width: "60%", height: 65, flexDirection: "column", marginTop: 0 }}>
+                                    <Text style={{ fontFamily: "mons-b", paddingLeft: 10, color: Colors.primaryColor }}>Numéro de téléphone <Text style={{ color: Colors.dangerColor }}>*</Text></Text>
+                                    <View style={inputGroup.container}>
+                                        <View style={[inputGroup.inputcontainer, { flexDirection: "row-reverse" }]}>
+                                            <TextInput
+                                                keyboardType='phone-pad'
+                                                onChangeText={t => setphone(t)}
+                                                value={phone}
+                                                autoComplete="off"
+                                                maxLength={10}
+                                                placeholder='Numéro'
+                                                style={{ backgroundColor: Colors.pillColor, height: "100%", width: "80%", paddingLeft: 25, fontFamily: "mons", fontSize: Dims.iputtextsize, color: Colors.primaryColor }}
+                                            />
+                                            <View style={{ width: "20%", alignContent: "center", alignItems: "flex-end", backgroundColor: Colors.pillColor, height: "100%", justifyContent: "center" }}>
+                                                <Text style={{ fontFamily: "mons", textAlign: "right", color: Colors.primaryColor }}>+243</Text>
+                                            </View>
+                                        </View>
                                     </View>
+                                </View>
+                                {/* ====== */}
+                                <View style={{ width: "35%", height: 65, flexDirection: "column", marginTop: 0 }}>
+                                    <Text style={{ fontFamily: "mons-b", paddingLeft: 10, color: Colors.primaryColor }}>Dévise <Text style={{ color: Colors.dangerColor }}>*</Text></Text>
+                                    <View style={inputGroup.container}>
+                                        <View style={inputGroup.inputcontainer}>
+                                            <Dropdown
+                                                style={[{ width: "100%", paddingRight: 15, marginTop: 0, height: "100%", backgroundColor: Colors.pillColor }]}
+                                                placeholderStyle={{ color: Colors.placeHolderColor, fontFamily: "mons", fontSize: Dims.iputtextsize, paddingLeft: 25 }}
+                                                containerStyle={{}}
+                                                selectedTextStyle={{ color: Colors.primaryColor, fontFamily: "mons", paddingLeft: 25, fontSize: Dims.iputtextsize }}
+                                                inputSearchStyle={{ backgroundColor: Colors.pillColor, height: 45, width: "95%", paddingLeft: 5, fontFamily: "mons", fontSize: Dims.iputtextsize }}
+                                                data={[{ id: "CDF", v: "CDF" }, { id: "USD", v: "USD" }]}
+                                                // search
+                                                maxHeight={200}
+                                                labelField="v"
+                                                valueField="id"
+                                                placeholder={'Dévise'}
+                                                onChange={item => {
+                                                    setdev(item.id)
+                                                }}
+                                            />
+                                        </View>
+                                        <View style={[inputGroup.iconcontainer, {}]}>
+                                            <Ionicons name="bookmark" size={Dims.iconsize - 4} color={Colors.primaryColor} />
+                                        </View>
+                                    </View>
+                                </View>
+                            </View>
+                        )}
+                        {/* ======================================= */}
+                        <View style={{ width: "100%", height: 65, flexDirection: "column", marginTop: 0 }}>
+                            <Text style={{ fontFamily: "mons-b", paddingLeft: 10, color: Colors.primaryColor }}>Agriculteur <Text style={{ color: Colors.dangerColor }}>*</Text></Text>
+                            <View style={inputGroup.container}>
+                                <View style={inputGroup.inputcontainer}>
+                                    <Dropdown
+                                        style={[{ width: "100%", paddingRight: 15, marginTop: 0, height: "100%", backgroundColor: Colors.pillColor }]}
+                                        placeholderStyle={{ color: Colors.placeHolderColor, fontFamily: "mons", fontSize: Dims.iputtextsize, paddingLeft: 25 }}
+                                        containerStyle={{}}
+                                        selectedTextStyle={{ color: Colors.primaryColor, fontFamily: "mons", paddingLeft: 25, fontSize: Dims.iputtextsize }}
+                                        inputSearchStyle={{ backgroundColor: Colors.pillColor, height: 45, width: "95%", paddingLeft: 5, fontFamily: "mons", fontSize: Dims.iputtextsize }}
+                                        data={agris}
+                                        maxHeight={200}
+                                        search
+                                        searchPlaceholder='Recherche ...'
+                                        labelField="fln"
+                                        placeholder='Agriculteur'
+                                        valueField="id"
+                                        onChange={item => {
+                                            setag(item.id)
+                                        }}
+                                    />
+                                </View>
+                                <View style={[inputGroup.iconcontainer, {}]}>
+                                    <Ionicons name="bookmark" size={Dims.iconsize - 4} color={Colors.primaryColor} />
                                 </View>
                             </View>
                         </View>
                         {/* ======================================= */}
-                        <View style={{width: "100%", height: 65, flexDirection: "column", marginTop: 15}}>
-                            <Text style={{ fontFamily: "mons-b", paddingLeft: 10, color: Colors.primaryColor }}>Marché <Text style={{color: Colors.dangerColor}}>*</Text></Text>
+                        <View style={{ width: "100%", height: 65, flexDirection: "column", marginTop: 15 }}>
+                            <Text style={{ fontFamily: "mons-b", paddingLeft: 10, color: Colors.primaryColor }}>Type d'abonnement <Text style={{ color: Colors.dangerColor }}>*</Text></Text>
+                            <View style={inputGroup.container}>
+                                <View style={inputGroup.inputcontainer}>
+                                    <Dropdown
+                                        style={[{ width: "100%", paddingRight: 15, marginTop: 0, height: "100%", backgroundColor: Colors.pillColor }]}
+                                        placeholderStyle={{ color: Colors.placeHolderColor, fontFamily: "mons", fontSize: Dims.iputtextsize, paddingLeft: 25 }}
+                                        containerStyle={{}}
+                                        selectedTextStyle={{ color: Colors.primaryColor, fontFamily: "mons", paddingLeft: 25, fontSize: Dims.iputtextsize }}
+                                        inputSearchStyle={{ backgroundColor: Colors.pillColor, height: 45, width: "95%", paddingLeft: 5, fontFamily: "mons", fontSize: Dims.iputtextsize }}
+                                        data={packets}
+                                        maxHeight={200}
+                                        labelField="type"
+                                        valueField="id"
+                                        onChange={item => {
+                                            setpack(item.id)
+                                        }}
+                                    />
+                                </View>
+                                <View style={[inputGroup.iconcontainer, {}]}>
+                                    <Ionicons name="bookmark" size={Dims.iconsize - 4} color={Colors.primaryColor} />
+                                </View>
+                            </View>
+                        </View>
+                        {/* ======================================= */}
+                        <View style={{ width: "100%", height: 65, flexDirection: "column", marginTop: 15 }}>
+                            {/* <Text style={{ color: Colors.dangerColor }}>*</Text> */}
+                            <Text style={{ fontFamily: "mons-b", paddingLeft: 10, color: Colors.primaryColor }}>Marchés</Text>
                             <View style={{ width: "100%", minHeight: 65, flexDirection: "column", marginTop: 0, position: "absolute", top: 25, zIndex: 38972 }}>
                                 <MultiSelect
                                     hideTags
-                                    items={ markets }
+                                    items={markets}
                                     // hideSubmitButton
                                     uniqueKey="id"
-                                    displayKey="designation"
-                                    ref={ ref }
+                                    displayKey="name"
+                                    ref={ref}
                                     styleListContainer={{ backgroundColor: Colors.whiteColor, paddingVertical: 0 }}
-                                    styleMainWrapper={{ minHeight: 65, paddingTop: 0, paddingHorizontal: 0,  }}
+                                    styleMainWrapper={{ minHeight: 65, paddingTop: 0, paddingHorizontal: 0, }}
                                     single={false}
                                     onSelectedItemsChange={(list) => {
-                                            onSelectedItemsChangeMarket(list)
-                                        }
-                                    }
-                                    selectedItems={ selectedItemsMarkets }
+                                        onSelectedItemsChangeMarket(list)
+                                    }}
+                                    selectedItems={selectedItemsMarkets}
                                     selectText="Séléctionner les marchés"
                                     searchInputPlaceholderText="Rechercher un marché ..."
-                                    onChangeInput={ (text) => {}}
+                                    onChangeInput={(text) => { }}
                                     altFontFamily="mons-b"
                                     tagRemoveIconColor="#CCC"
                                     tagBorderColor="#CCC"
                                     tagTextColor="#CCC"
-                                    // fixedHeight={true}
-                                    // removeSelected
                                     selectedItemTextColor={Colors.primaryColor}
                                     selectedItemIconColor={Colors.primaryColor}
                                     itemTextColor={Colors.darkColor}
@@ -386,7 +567,7 @@ export const AbonnemetScreen = ({ navigation, route }) => {
                                     submitButtonText="Ajouter les marchés séléctionés"
                                     fontFamily='mons'
                                     noItemsText='Aucune information pour le moment'
-                                    styleRowList={{ 
+                                    styleRowList={{
                                         paddingVertical: 4,
                                         marginTop: 2,
                                         height: Dims.inputTextHeight,
@@ -397,9 +578,9 @@ export const AbonnemetScreen = ({ navigation, route }) => {
                                     }}
                                     fixedHeight={250}
 
-                                    // onToggleList={() => {
-                                    //     alert(1)
-                                    // }}
+                                // onToggleList={() => {
+                                //     alert(1)
+                                // }}
                                 />
                             </View>
                             {/* <View style={ inputGroup.container }>
@@ -428,35 +609,7 @@ export const AbonnemetScreen = ({ navigation, route }) => {
                             </View> */}
                         </View>
                         {/* ======================================= */}
-                        <View style={{width: "100%", height: 65, flexDirection: "column", marginTop: 15}}>
-                            <Text style={{ fontFamily: "mons-b", paddingLeft: 10, color: Colors.primaryColor }}>Type d'abonnement <Text style={{color: Colors.dangerColor}}>*</Text></Text>
-                            <View style={ inputGroup.container }>
-                                <View style={ inputGroup.inputcontainer }>
-                                    <Dropdown
-                                        style={[{ width: "100%", paddingRight: 15, marginTop: 0, height: "100%", backgroundColor: Colors.pillColor }]}
-                                        placeholderStyle={{ color: Colors.placeHolderColor, fontFamily: "mons", fontSize: Dims.iputtextsize, paddingLeft: 25 }}
-                                        containerStyle={{}}
-                                        selectedTextStyle={{ color: Colors.primaryColor, fontFamily: "mons", paddingLeft: 25, fontSize: Dims.iputtextsize }}
-                                        inputSearchStyle={{ backgroundColor: Colors.pillColor, height: 45, width: "95%", paddingLeft: 5, fontFamily: "mons", fontSize: Dims.iputtextsize }}
-                                        data={packets}
-                                        search
-                                        maxHeight={ 200 }
-                                        labelField="designation"
-                                        valueField="id"
-                                        placeholder={'Séléctionner un pacquet'}
-                                        searchPlaceholder="Recherche ..."
-                                        onChange={item => {
-                                            setpack(item.id)
-                                        }}
-                                    />
-                                </View>
-                                <View style={[ inputGroup.iconcontainer, { }]}>
-                                    <Ionicons name="bookmark" size={ Dims.iconsize - 4 } color={ Colors.primaryColor } />
-                                </View>
-                            </View>
-                        </View>
-                        {/* ======================================= */}
-                        <View style={{width: "100%", height: 65, flexDirection: "column", marginTop: 15}}>
+                        {/* <View style={{width: "100%", height: 65, flexDirection: "column", marginTop: 15}}>
                             <Text style={{ fontFamily: "mons-b", paddingLeft: 10, color: Colors.primaryColor }}>Langue <Text style={{color: Colors.dangerColor}}>*</Text></Text>
                             <View style={ inputGroup.container }>
                                 <View style={ inputGroup.inputcontainer }>
@@ -482,25 +635,25 @@ export const AbonnemetScreen = ({ navigation, route }) => {
                                     <Ionicons name="language" size={ Dims.iconsize - 4 } color={ Colors.primaryColor } />
                                 </View>
                             </View>
-                        </View>
+                        </View> */}
                         {/* ======================================= */}
-                        <View style={{width: "100%", height: 65, flexDirection: "column", marginTop: 15}}>
-                            <Text style={{ fontFamily: "mons-b", paddingLeft: 10, color: Colors.primaryColor }}>Produits agricoles <Text style={{color: Colors.dangerColor}}>*</Text></Text>
+                        <View style={{ width: "100%", height: 65, flexDirection: "column", marginTop: 15 }}>
+                            <Text style={{ fontFamily: "mons-b", paddingLeft: 10, color: Colors.primaryColor }}>Produits agricoles <Text style={{ color: Colors.dangerColor }}>*</Text></Text>
                             <View style={{ width: "100%", minHeight: 65, flexDirection: "column", marginTop: 0, position: "absolute", top: 25, zIndex: 28972 }}>
                                 <MultiSelect
                                     hideTags
                                     // hideSubmitButton
                                     items={products}
                                     uniqueKey="id"
-                                    displayKey="designation"
-                                    ref={ ref }
+                                    displayKey="cultures"
+                                    ref={ref}
                                     styleListContainer={{ backgroundColor: Colors.whiteColor, paddingVertical: 0 }}
-                                    styleMainWrapper={{ minHeight: 65, paddingTop: 0, paddingHorizontal: 0,  }}
-                                    onSelectedItemsChange={ onSelectedItemsChange }
+                                    styleMainWrapper={{ minHeight: 65, paddingTop: 0, paddingHorizontal: 0, }}
+                                    onSelectedItemsChange={onSelectedItemsChange}
                                     selectedItems={selectedItems}
                                     selectText="Séléctionner les produits"
                                     searchInputPlaceholderText="Rechercher d'un produit ..."
-                                    onChangeInput={ (text) => {}}
+                                    onChangeInput={(text) => { }}
                                     altFontFamily="mons-b"
                                     tagRemoveIconColor="#CCC"
                                     tagBorderColor="#CCC"
@@ -517,7 +670,7 @@ export const AbonnemetScreen = ({ navigation, route }) => {
                                     styleDropdownMenuSubsection={{ paddingVertical: 0, marginTop: 0 }}
                                     submitButtonText="Ajouter les séléctions"
                                     noItemsText='Aucune information pour le moment'
-                                    styleRowList={{ 
+                                    styleRowList={{
                                         paddingVertical: 4,
                                         marginTop: 2,
                                         height: Dims.inputTextHeight,
@@ -532,16 +685,16 @@ export const AbonnemetScreen = ({ navigation, route }) => {
                         </View>
                         {/* ======================================= */}
                         <View style={{ width: "100%", height: 65, flexDirection: "column", marginTop: 25 }}>
-                            <TouchableHighlight 
+                            <TouchableHighlight
                                 onPress={handlConfirm}
-                                underlayColor={ Colors.primaryColor }
+                                underlayColor={Colors.primaryColor}
                                 style={[btn]}
                             >
-                                {isloading 
-                                ?
+                                {isloading
+                                    ?
                                     <Loader />
-                                :
-                                    <Text style={{ color: Colors.whiteColor, fontFamily: "mons-b" }}>Confirmer</Text>    
+                                    :
+                                    <Text style={{ color: Colors.whiteColor, fontFamily: "mons-b" }}>Confirmer</Text>
                                 }
                             </TouchableHighlight>
                         </View>
@@ -551,18 +704,18 @@ export const AbonnemetScreen = ({ navigation, route }) => {
             </View>
 
             <BottomSheetDialog
-                navigation={navigation} 
-                visible={isVisible} 
+                navigation={navigation}
+                visible={isVisible}
                 title={
                     {
-                        color: Colors.dangerColor, 
+                        color: Colors.dangerColor,
                         text: title.length > 0 ? title : "Connectivité"
                     }
-                } 
+                }
                 subTitle={
-                    { 
-                        sColor: Colors.darkColor, 
-                        sText: output && output.toString().length > 0 ? output.toString() : "Il semble que vous n'êtes pas connectez sur internet, vos informations peuvent être enregistrées en local; vous pouvew faire la synchronisation plus tard" 
+                    {
+                        sColor: Colors.darkColor,
+                        sText: output && output.toString().length > 0 ? output.toString() : "Il semble que vous n'êtes pas connectez sur internet, vos informations peuvent être enregistrées en local; vous pouvew faire la synchronisation plus tard"
                     }
                 }
             />
@@ -571,25 +724,25 @@ export const AbonnemetScreen = ({ navigation, route }) => {
                 <Modal
                     style={{ position: "absolute", width: "95%", bottom: -20, height: 80, overflow: "hidden", backgroundColor: Colors.whiteColor, alignSelf: "center", borderTopStartRadius: Dims.borderradius + 30, borderTopEndRadius: Dims.borderradius + 30 }}
                     isVisible={isVisibleA}
-                    onBackButtonPress={() => { 
+                    onBackButtonPress={() => {
                         setisVisibleA(false)
                     }}
-                    onBackdropPress={() => { 
+                    onBackdropPress={() => {
                         setisVisibleA(false)
                     }}
-                    onDismiss={() => { 
+                    onDismiss={() => {
                         setisVisibleA(false)
                     }}
                 >
                     <View style={{ padding: 2, flexDirection: "row", alignContent: "center", alignItems: "center", justifyContent: "space-around" }}>
-                        <TouchableHighlight 
+                        <TouchableHighlight
                             underlayColor={"transparent"}
                             onPress={() => {
                                 handlePayement({ payementMethode: 2 })
                             }}
                             style={{ backgroundColor: Colors.pillColor, padding: 5, width: "45%", borderRadius: 0, borderTopStartRadius: Dims.borderradius + 20 }}
                         >
-                            <View style={{ flexDirection: "column", justifyContent: "center", alignContent: "center", alignItems: "center", paddingVertical: 7  }}>
+                            <View style={{ flexDirection: "column", justifyContent: "center", alignContent: "center", alignItems: "center", paddingVertical: 7 }}>
                                 <Feather name="package" size={Dims.iconsize + 5} color={Colors.primaryColor} />
                                 <Text style={{ fontFamily: "mons-e", fontSize: 10, paddingTop: 5 }} >Paiement par paquet</Text>
                             </View>
@@ -601,7 +754,7 @@ export const AbonnemetScreen = ({ navigation, route }) => {
                             }}
                             style={{ backgroundColor: Colors.pillColor, padding: 5, width: "45%", borderRadius: 0, borderTopEndRadius: Dims.borderradius + 20 }}
                         >
-                            <View style={{ flexDirection: "column", justifyContent: "center", alignContent: "center", alignItems: "center", paddingVertical: 7  }}>
+                            <View style={{ flexDirection: "column", justifyContent: "center", alignContent: "center", alignItems: "center", paddingVertical: 7 }}>
                                 {/* <FontAwesome5 name="money-bill-alt"  /> */}
                                 <MaterialIcons name="send-to-mobile" size={Dims.iconsize + 5} color={Colors.primaryColor} />
                                 <Text style={{ fontFamily: "mons-e", fontSize: 10, paddingTop: 5 }} >Paiement par mobile money</Text>
